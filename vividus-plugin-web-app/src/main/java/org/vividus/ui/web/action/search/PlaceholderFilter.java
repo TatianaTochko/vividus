@@ -20,6 +20,11 @@ import org.openqa.selenium.WebElement;
 
 public class PlaceholderFilter extends AbstractElementFilterAction
 {
+    public PlaceholderFilter()
+    {
+        super(ActionAttributeType.PLACEHOLDER);
+    }
+
     @Override
     protected boolean matches(WebElement element, String placeholder)
     {

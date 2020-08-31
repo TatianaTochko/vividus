@@ -38,11 +38,11 @@ import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Interactive;
+import org.vividus.bdd.steps.ui.validation.IBaseValidations;
 import org.vividus.bdd.steps.ui.web.model.Location;
-import org.vividus.bdd.steps.ui.web.validation.IBaseValidations;
 import org.vividus.selenium.IWebDriverProvider;
+import org.vividus.ui.action.search.SearchAttributes;
 import org.vividus.ui.web.action.IJavascriptActions;
-import org.vividus.ui.web.action.search.SearchAttributes;
 
 @ExtendWith(MockitoExtension.class)
 class DragAndDropStepsTests

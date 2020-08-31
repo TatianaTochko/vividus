@@ -32,16 +32,16 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.vividus.bdd.monitor.TakeScreenshotOnFailure;
 import org.vividus.bdd.steps.StringComparisonRule;
-import org.vividus.bdd.steps.ui.web.validation.IBaseValidations;
-import org.vividus.bdd.steps.ui.web.validation.IDescriptiveSoftAssert;
+import org.vividus.bdd.steps.ui.validation.IBaseValidations;
+import org.vividus.bdd.steps.ui.validation.IDescriptiveSoftAssert;
 import org.vividus.selenium.IWebDriverProvider;
-import org.vividus.ui.web.State;
-import org.vividus.ui.web.action.IWaitActions;
+import org.vividus.ui.State;
+import org.vividus.ui.action.IWaitActions;
+import org.vividus.ui.action.WaitResult;
+import org.vividus.ui.action.search.SearchAttributes;
+import org.vividus.ui.context.IUiContext;
 import org.vividus.ui.web.action.IWindowsActions;
-import org.vividus.ui.web.action.WaitResult;
 import org.vividus.ui.web.action.search.ActionAttributeType;
-import org.vividus.ui.web.action.search.SearchAttributes;
-import org.vividus.ui.web.context.IWebUiContext;
 import org.vividus.ui.web.util.LocatorUtil;
 
 @TakeScreenshotOnFailure
@@ -50,7 +50,7 @@ public class SetContextSteps
     private static final String AN_ELEMENT_WITH_THE_ATTRIBUTE = "An element with the attribute '%1$s'='%2$s'";
 
     @Inject private IWebDriverProvider webDriverProvider;
-    @Inject private IWebUiContext webUiContext;
+    @Inject private IUiContext uiContext;
     @Inject private IBaseValidations baseValidations;
     @Inject private IDescriptiveSoftAssert descriptiveSoftAssert;
     @Inject private IWindowsActions windowsActions;
@@ -67,7 +67,7 @@ public class SetContextSteps
     @When("I change context to the page")
     public void changeContextToPage()
     {
-        webUiContext.reset();
+        uiContext.reset();
     }
 
     /**
@@ -79,7 +79,7 @@ public class SetContextSteps
     {
         changeContextToPage();
         WebElement element = baseValidations.assertIfElementExists("Element to set context", locator);
-        webUiContext.putSearchContext(element, () -> changeContextToElement(locator));
+        uiContext.putSearchContext(element, () -> changeContextToElement(locator));
     }
 
     /**
@@ -97,7 +97,7 @@ public class SetContextSteps
                 String.format("An element with the name '%1$s'", name),
                 new SearchAttributes(ActionAttributeType.ELEMENT_NAME, name)
                         .addFilter(ActionAttributeType.STATE, state.toString()));
-        webUiContext.putSearchContext(element, () -> changeContextToElementWithName(state, name));
+        uiContext.putSearchContext(element, () -> changeContextToElementWithName(state, name));
     }
 
     /**
@@ -115,7 +115,7 @@ public class SetContextSteps
                 String.format(AN_ELEMENT_WITH_THE_ATTRIBUTE, attributeType, attributeValue),
                 new SearchAttributes(ActionAttributeType.XPATH,
                         LocatorUtil.getXPathByAttribute(attributeType, attributeValue)));
-        webUiContext.putSearchContext(element, () -> changeContextToElementWithAttribute(attributeType,
+        uiContext.putSearchContext(element, () -> changeContextToElementWithAttribute(attributeType,
                 attributeValue));
     }
 
@@ -138,7 +138,7 @@ public class SetContextSteps
         {
             element = null;
         }
-        webUiContext.putSearchContext(element, () -> changeContextToStateElementWithAttribute(state,
+        uiContext.putSearchContext(element, () -> changeContextToStateElementWithAttribute(state,
                 attributeType, attributeValue));
     }
 

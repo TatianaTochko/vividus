@@ -37,19 +37,19 @@ import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.vividus.bdd.steps.ui.web.validation.IBaseValidations;
+import org.vividus.bdd.steps.ui.validation.IBaseValidations;
 import org.vividus.selenium.IWebDriverProvider;
 import org.vividus.softassert.ISoftAssert;
-import org.vividus.ui.web.State;
-import org.vividus.ui.web.action.IExpectedConditions;
-import org.vividus.ui.web.action.IExpectedSearchContextCondition;
+import org.vividus.ui.State;
+import org.vividus.ui.action.IExpectedConditions;
+import org.vividus.ui.action.IExpectedSearchContextCondition;
+import org.vividus.ui.action.ISearchActions;
+import org.vividus.ui.action.WaitResult;
+import org.vividus.ui.action.search.SearchAttributes;
+import org.vividus.ui.context.IUiContext;
 import org.vividus.ui.web.action.IJavascriptActions;
-import org.vividus.ui.web.action.ISearchActions;
-import org.vividus.ui.web.action.IWaitActions;
-import org.vividus.ui.web.action.WaitResult;
+import org.vividus.ui.web.action.IWebWaitActions;
 import org.vividus.ui.web.action.search.ActionAttributeType;
-import org.vividus.ui.web.action.search.SearchAttributes;
-import org.vividus.ui.web.context.IWebUiContext;
 import org.vividus.ui.web.util.LocatorUtil;
 
 @SuppressWarnings("unchecked")
@@ -73,10 +73,10 @@ class WaitStepsTests
     private IWebDriverProvider webDriverProvider;
 
     @Mock
-    private IWaitActions waitActions;
+    private IWebWaitActions waitActions;
 
     @Mock
-    private IWebUiContext webUiContext;
+    private IUiContext uiContext;
 
     @Mock
     private WebElement webElement;
@@ -109,7 +109,7 @@ class WaitStepsTests
     void testElementByIdDisappears()
     {
         By locator = By.xpath(".//*[normalize-space(@id)=\"id\"]");
-        when(webUiContext.getSearchContext()).thenReturn(webElement);
+        when(uiContext.getSearchContext()).thenReturn(webElement);
         IExpectedSearchContextCondition<Boolean> condition = mock(IExpectedSearchContextCondition.class);
         when(expectedSearchContextConditions.invisibilityOfElement(locator)).thenReturn(condition);
         waitSteps.elementByIdDisappears("id");
@@ -119,7 +119,7 @@ class WaitStepsTests
     @Test
     void testElementByNameDisappearsWithTimeout()
     {
-        when(webUiContext.getSearchContext()).thenReturn(webElement);
+        when(uiContext.getSearchContext()).thenReturn(webElement);
         WaitResult<Boolean> waitResult = mock(WaitResult.class);
         SearchAttributes attributes = new SearchAttributes(ActionAttributeType.ELEMENT_NAME, NAME);
         IExpectedSearchContextCondition<Boolean> condition = mock(IExpectedSearchContextCondition.class);
@@ -149,7 +149,7 @@ class WaitStepsTests
     @Test
     void testWaitTillElementAppears()
     {
-        when(webUiContext.getSearchContext()).thenReturn(webElement);
+        when(uiContext.getSearchContext()).thenReturn(webElement);
         WaitResult<WebElement> waitResult = mock(WaitResult.class);
         SearchAttributes attributes = new SearchAttributes(ActionAttributeType.ELEMENT_NAME, NAME);
         IExpectedSearchContextCondition<WebElement> condition = mock(IExpectedSearchContextCondition.class);
@@ -162,7 +162,7 @@ class WaitStepsTests
     @Test
     void testWaitTillElementWithTagAndAttributeAppears()
     {
-        when(webUiContext.getSearchContext()).thenReturn(webElement);
+        when(uiContext.getSearchContext()).thenReturn(webElement);
         By locator = By.xpath(ELEMENT_WITH_TAG);
         WaitResult<List<WebElement>> waitResult = mock(WaitResult.class);
         IExpectedSearchContextCondition<List<WebElement>> condition = mock(IExpectedSearchContextCondition.class);
@@ -175,7 +175,7 @@ class WaitStepsTests
     @Test
     void testWaitTillElementContainsText()
     {
-        when(webUiContext.getSearchContext()).thenReturn(webElement);
+        when(uiContext.getSearchContext()).thenReturn(webElement);
         SearchAttributes attributes = new SearchAttributes(ActionAttributeType.ELEMENT_NAME, NAME);
         IExpectedSearchContextCondition<Boolean> condition = mock(IExpectedSearchContextCondition.class);
         when(expectedSearchActionsConditions.textToBePresentInElementLocated(attributes, TEXT)).thenReturn(condition);
@@ -186,7 +186,7 @@ class WaitStepsTests
     @Test
     void testWaitTillElementDisappears()
     {
-        when(webUiContext.getSearchContext()).thenReturn(webElement);
+        when(uiContext.getSearchContext()).thenReturn(webElement);
         WaitResult<Boolean> waitResult = mock(WaitResult.class);
         SearchAttributes attributes = new SearchAttributes(ActionAttributeType.ELEMENT_NAME, NAME);
         IExpectedSearchContextCondition<Boolean> condition = mock(IExpectedSearchContextCondition.class);
@@ -199,7 +199,7 @@ class WaitStepsTests
     @Test
     void testWaitTillElementWithTagAndAttributeDisappears()
     {
-        when(webUiContext.getSearchContext()).thenReturn(webElement);
+        when(uiContext.getSearchContext()).thenReturn(webElement);
         when(webDriverProvider.get()).thenReturn(webDriver);
         List<WebElement> elements = List.of(webElement);
         SearchAttributes attributes = new SearchAttributes(ActionAttributeType.XPATH, ELEMENT_WITH_TAG);
@@ -222,7 +222,7 @@ class WaitStepsTests
     @Test
     void testWaitTillElementIsSelected()
     {
-        when(webUiContext.getSearchContext()).thenReturn(webElement);
+        when(uiContext.getSearchContext()).thenReturn(webElement);
         SearchAttributes attributes = new SearchAttributes(ActionAttributeType.ELEMENT_NAME, NAME);
         IExpectedSearchContextCondition<WebElement> expectedCondition = mock(IExpectedSearchContextCondition.class);
         when(expectedSearchActionsConditions.elementToBeClickable(attributes)).thenReturn(expectedCondition);
@@ -245,7 +245,7 @@ class WaitStepsTests
     @Test
     void testWaitTillElementsAreVisible()
     {
-        when(webUiContext.getSearchContext()).thenReturn(webElement);
+        when(uiContext.getSearchContext()).thenReturn(webElement);
         SearchAttributes attributes = new SearchAttributes(ActionAttributeType.ELEMENT_NAME, NAME);
         WaitResult<WebElement> waitResult = mock(WaitResult.class);
         IExpectedSearchContextCondition<WebElement> condition = mock(IExpectedSearchContextCondition.class);
@@ -258,7 +258,7 @@ class WaitStepsTests
     @Test
     void testWaitDurationWithPollingDurationTillElementDisappears()
     {
-        when(webUiContext.getSearchContext()).thenReturn(webElement);
+        when(uiContext.getSearchContext()).thenReturn(webElement);
         WaitResult<Boolean> waitResult = new WaitResult<>();
         waitResult.setWaitPassed(true);
         SearchAttributes attributes = new SearchAttributes(ActionAttributeType.XPATH, XPATH);
@@ -272,7 +272,7 @@ class WaitStepsTests
     @Test
     void testWaitTillFrameAppears()
     {
-        when(webUiContext.getSearchContext(WebDriver.class)).thenReturn(webDriver);
+        when(uiContext.getSearchContext(WebDriver.class)).thenReturn(webDriver);
         WaitResult<List<WebElement>> waitResult = mock(WaitResult.class);
         IExpectedSearchContextCondition<List<WebElement>> condition = mock(IExpectedSearchContextCondition.class);
         By locator = LocatorUtil
@@ -342,7 +342,7 @@ class WaitStepsTests
     @Test
     void testDoesElementExistsForTimePeriod()
     {
-        when(webUiContext.getSearchContext()).thenReturn(webElement);
+        when(uiContext.getSearchContext()).thenReturn(webElement);
         By xpath =  By.xpath(XPATH);
         IExpectedSearchContextCondition<List<WebElement>> condition = mock(IExpectedSearchContextCondition.class);
         when(expectedSearchContextConditions.presenceOfAllElementsLocatedBy(xpath)).thenReturn(condition);

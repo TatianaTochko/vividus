@@ -44,14 +44,14 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.vividus.bdd.steps.ComparisonRule;
 import org.vividus.bdd.steps.SubSteps;
-import org.vividus.bdd.steps.ui.web.validation.IBaseValidations;
+import org.vividus.bdd.steps.ui.validation.IBaseValidations;
 import org.vividus.softassert.ISoftAssert;
+import org.vividus.ui.action.ISearchActions;
+import org.vividus.ui.action.search.SearchAttributes;
+import org.vividus.ui.context.IUiContext;
+import org.vividus.ui.context.SearchContextSetter;
 import org.vividus.ui.web.action.ICssSelectorFactory;
-import org.vividus.ui.web.action.ISearchActions;
 import org.vividus.ui.web.action.search.ActionAttributeType;
-import org.vividus.ui.web.action.search.SearchAttributes;
-import org.vividus.ui.web.context.IWebUiContext;
-import org.vividus.ui.web.context.SearchContextSetter;
 
 @ExtendWith(MockitoExtension.class)
 class NestedStepsTests
@@ -65,7 +65,7 @@ class NestedStepsTests
     @Mock
     private IBaseValidations baseValidations;
     @Mock
-    private IWebUiContext webUiContext;
+    private IUiContext uiContext;
     @Mock
     private SubSteps subSteps;
     @Mock
@@ -89,13 +89,14 @@ class NestedStepsTests
                 ComparisonRule.EQUAL_TO)).thenReturn(Arrays.asList(first, second));
         when(cssSelectorFactory.getCssSelectors(List.of(first, second)))
             .thenReturn(List.of(FIRST_XPATH, SECOND_XPATH).stream());
-        SearchAttributes secondSearchAttributes = new SearchAttributes(ActionAttributeType.CSS_SELECTOR, SECOND_XPATH);
+        SearchAttributes secondSearchAttributes = new SearchAttributes(ActionAttributeType.CSS_SELECTOR,
+                SECOND_XPATH);
         when(baseValidations.assertIfElementExists("An element for iteration 2",
                 secondSearchAttributes)).thenReturn(second);
         SearchContextSetter searchContextSetter = mockSearchContextSetter();
         nestedSteps.performAllStepsForElementIfFound(ComparisonRule.EQUAL_TO, 1, searchAttributes, subSteps);
-        verify(webUiContext).putSearchContext(eq(first), any(SearchContextSetter.class));
-        verify(webUiContext).putSearchContext(eq(second), any(SearchContextSetter.class));
+        verify(uiContext).putSearchContext(eq(first), any(SearchContextSetter.class));
+        verify(uiContext).putSearchContext(eq(second), any(SearchContextSetter.class));
         verify(searchContextSetter, times(2)).setSearchContext();
     }
 
@@ -107,7 +108,7 @@ class NestedStepsTests
                 ComparisonRule.GREATER_THAN_OR_EQUAL_TO)).thenReturn(List.of());
         nestedSteps.performAllStepsForElementIfFound(ComparisonRule.GREATER_THAN_OR_EQUAL_TO, 0,
                 searchAttributes, subSteps);
-        verifyNoInteractions(cssSelectorFactory, webUiContext, subSteps);
+        verifyNoInteractions(cssSelectorFactory, uiContext, subSteps);
     }
 
     @Test
@@ -119,7 +120,7 @@ class NestedStepsTests
                 ComparisonRule.EQUAL_TO)).thenReturn(List.of(element));
         when(cssSelectorFactory.getCssSelectors(List.of(element))).thenReturn(List.of(FIRST_XPATH).stream());
         SearchContextSetter searchContextSetter = mockSearchContextSetter();
-        doThrow(new StaleElementReferenceException("stale element")).when(webUiContext).putSearchContext(eq(element),
+        doThrow(new StaleElementReferenceException("stale element")).when(uiContext).putSearchContext(eq(element),
                 any(SearchContextSetter.class));
         assertThrows(StaleElementReferenceException.class, () -> nestedSteps
                 .performAllStepsForElementIfFound(ComparisonRule.EQUAL_TO, 1, searchAttributes, subSteps));
@@ -129,7 +130,7 @@ class NestedStepsTests
     @Test
     void shouldExecuteStepsAndExitWhenQuantityChangedAndIterationLimitNotReached()
     {
-        SearchContext searchContext = mockWebUiContext();
+        SearchContext searchContext = mockUiContext();
         SearchAttributes searchAttributes = mock(SearchAttributes.class);
         List<WebElement> elements = List.of(mock(WebElement.class));
         when(searchActions.findElements(searchContext, searchAttributes)).thenReturn(elements).thenReturn(elements)
@@ -147,24 +148,24 @@ class NestedStepsTests
                 argThat(m -> ComparisonRule.EQUAL_TO.getComparisonRule(1).toString().equals(m.toString())));
     }
 
-    private SearchContext mockWebUiContext()
+    private SearchContext mockUiContext()
     {
         SearchContext searchContext = mock(SearchContext.class);
-        when(webUiContext.getSearchContext()).thenReturn(searchContext);
+        when(uiContext.getSearchContext()).thenReturn(searchContext);
         return searchContext;
     }
 
     private SearchContextSetter mockSearchContextSetter()
     {
         SearchContextSetter searchContextSetter = mock(SearchContextSetter.class);
-        when(webUiContext.getSearchContextSetter()).thenReturn(searchContextSetter);
+        when(uiContext.getSearchContextSetter()).thenReturn(searchContextSetter);
         return searchContextSetter;
     }
 
     @Test
     void shouldExecuteStepsAndExitAndRecordFailedAssertionWhenIterationLimitReached()
     {
-        SearchContext searchContext = mockWebUiContext();
+        SearchContext searchContext = mockUiContext();
         SearchAttributes searchAttributes = mock(SearchAttributes.class);
         List<WebElement> elements = List.of(mock(WebElement.class));
         when(searchActions.findElements(searchContext, searchAttributes)).thenReturn(elements);
@@ -188,13 +189,13 @@ class NestedStepsTests
 
         nestedSteps.performAllStepsWhileElementsExist(ComparisonRule.EQUAL_TO, 1, searchAttributes, -1, subSteps);
 
-        verifyNoInteractions(webUiContext, softAssert, subSteps, searchActions);
+        verifyNoInteractions(uiContext, softAssert, subSteps, searchActions);
     }
 
     @Test
     void shouldNotExecuteStepsIfInitialElementsNumberIsNotValid()
     {
-        SearchContext searchContext = mockWebUiContext();
+        SearchContext searchContext = mockUiContext();
         SearchAttributes searchAttributes = mock(SearchAttributes.class);
         when(searchActions.findElements(searchContext, searchAttributes)).thenReturn(List.of(mock(WebElement.class)));
 
@@ -205,6 +206,6 @@ class NestedStepsTests
         verify(softAssert).assertThat(eq(ELEMENTS_NUMBER), eq(1), argThat(m ->
             ComparisonRule.EQUAL_TO.getComparisonRule(2).toString().equals(m.toString())));
         verify(softAssert, never()).recordFailedAssertion(anyString());
-        verify(webUiContext, never()).getSearchContextSetter();
+        verify(uiContext, never()).getSearchContextSetter();
     }
 }

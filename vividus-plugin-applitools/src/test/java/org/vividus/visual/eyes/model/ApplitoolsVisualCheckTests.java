@@ -22,8 +22,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
+import org.vividus.ui.action.search.SearchAttributes;
 import org.vividus.ui.web.action.search.ActionAttributeType;
-import org.vividus.ui.web.action.search.SearchAttributes;
 import org.vividus.visual.screenshot.IgnoreStrategy;
 
 class ApplitoolsVisualCheckTests

@@ -16,18 +16,10 @@
 
 package org.vividus.ui.web.action.search;
 
-import static org.vividus.ui.web.action.search.AbstractElementSearchAction.generateCaseInsensitiveLocator;
-
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.support.How;
-import org.vividus.ui.web.util.LocatorUtil;
+import org.vividus.ui.action.search.IActionAttributeType;
+import org.vividus.ui.action.search.IElementAction;
 
 public enum ActionAttributeType implements IActionAttributeType
 {
@@ -35,25 +27,13 @@ public enum ActionAttributeType implements IActionAttributeType
     LINK_URL("URL", LinkUrlSearch.class),
     LINK_URL_PART("URL part", LinkUrlPartSearch.class),
     CASE_SENSITIVE_TEXT("Case sensitive text", CaseSensitiveTextSearch.class),
-    CASE_INSENSITIVE_TEXT("Case insensitive text",
-        parameters -> generateCaseInsensitiveLocator(parameters.getValue().toLowerCase(), "*")),
-    TOOLTIP("Tooltip",
-        parameters -> LocatorUtil.getXPathLocator(".//*[@title=%s]", parameters.getValue()),
-        TooltipFilter.class),
-    DEFAULT("", DefaultSearch.class),
-    XPATH("XPath", parameters -> How.XPATH.buildBy(parameters.getValue())),
-    CSS_SELECTOR("CSS selector", parameters -> How.CSS.buildBy(parameters.getValue())),
-    TAG_NAME("Tag name", parameters -> How.TAG_NAME.buildBy(parameters.getValue())),
-    IMAGE_SRC("Image source",
-        parameters -> LocatorUtil.getXPathLocator(".//img[@src='%s']", parameters.getValue())),
-    IMAGE_SRC_PART("Image source part",
-        parameters -> LocatorUtil.getXPathLocator(".//img[contains(@src,'%s')]", parameters.getValue()),
-        ImageWithSourcePartFilter.class),
+    CASE_INSENSITIVE_TEXT("Case insensitive text", CaseInsensitiveTextSearch.class),
+    TOOLTIP("Tooltip", TooltipFilter.class),
+    CSS_SELECTOR("CSS selector", CssSelectorSearch.class),
+    IMAGE_SRC("Image source", ImageWithSourceSearch.class),
+    IMAGE_SRC_PART("Image source part", ImageWithSourcePartFilter.class),
     BUTTON_NAME("Button name", ButtonNameSearch.class),
-    FIELD_NAME("Field name",
-        // due to firefox bug, we can't use name() and must use local-name() as workaround 'body' represents CKE editor
-        parameters -> LocatorUtil.getXPathLocator(".//*[(local-name() = 'input' or local-name() = 'textarea' or "
-                + "local-name()='body') and ((@* | text())=%s)]", parameters.getValue())),
+    FIELD_NAME("Field name", FieldNameSearch.class),
     TEXT_PART("Text part", TextPartFilter.class),
     PLACEHOLDER("Placeholder", PlaceholderFilter.class),
     STATE("State", StateFilter.class),
@@ -66,52 +46,42 @@ public enum ActionAttributeType implements IActionAttributeType
     FIELD_TEXT_PART("Field text part", FieldTextPartFilter.class),
     DROP_DOWN_TEXT("Drop down text", DropDownTextFilter.class),
     ELEMENT_NAME("Element name", ElementNameSearch.class),
-    ID("Id", parameters -> How.ID.buildBy(parameters.getValue())),
-    CLASS_NAME("Class name", parameters -> How.CLASS_NAME.buildBy(parameters.getValue()));
-
-    private static final Set<ActionAttributeType> SEARCH_TYPES;
-    private static final Set<ActionAttributeType> FILTER_TYPES;
+    NAME("Name", NameSearch.class),
+    PARTIAL_LINK_TEXT("Partial link text", PartialLinkTextSearch.class),
+    CLASS_NAME("Class name", ClassNameSearch.class),
+    XPATH("XPath", XpathSearch.class),
+    ID("Id", IdSearch.class),
+    TAG_NAME("Tag name", TagNameSearch.class);
 
     private final String attributeName;
     private final Class<? extends IElementAction> actionClass;
-    private final transient Function<SearchParameters, By> searchLocatorBuilder;
-    private IActionAttributeType competingType;
+    private Set<IActionAttributeType> competingKeys;
 
     ActionAttributeType(String attributeName, Class<? extends IElementAction> actionClass)
     {
         this.attributeName = attributeName;
         this.actionClass = actionClass;
-        searchLocatorBuilder = null;
-    }
-
-    ActionAttributeType(String attributeName, Function<SearchParameters, By> searchLocatorBuilder)
-    {
-        this(attributeName, searchLocatorBuilder, null);
-    }
-
-    ActionAttributeType(String attributeName, Function<SearchParameters, By> searchLocatorBuilder,
-            Class<? extends IElementFilterAction> filterActionClass)
-    {
-        this.attributeName = attributeName;
-        this.actionClass = filterActionClass;
-        this.searchLocatorBuilder = searchLocatorBuilder;
+        this.competingKeys = Set.of();
     }
 
     static
     {
-        CASE_INSENSITIVE_TEXT.competingType = TEXT_PART;
-        TEXT_PART.competingType = CASE_INSENSITIVE_TEXT;
-        CASE_SENSITIVE_TEXT.competingType = TEXT_PART;
-        TEXT_PART.competingType = CASE_SENSITIVE_TEXT;
-        IMAGE_SRC.competingType = IMAGE_SRC_PART;
-        IMAGE_SRC_PART.competingType = IMAGE_SRC;
-        LINK_URL.competingType = LINK_URL_PART;
-        LINK_URL_PART.competingType = LINK_URL;
-        FIELD_TEXT.competingType = FIELD_TEXT_PART;
-        FIELD_TEXT_PART.competingType = FIELD_TEXT;
+        CASE_INSENSITIVE_TEXT.competingKeys = Set.of(ActionAttributeType.TEXT_PART);
+        TEXT_PART.competingKeys = Set.of(ActionAttributeType.CASE_INSENSITIVE_TEXT,
+            ActionAttributeType.CASE_SENSITIVE_TEXT);
+        CASE_SENSITIVE_TEXT.competingKeys = Set.of(ActionAttributeType.TEXT_PART);
+        IMAGE_SRC.competingKeys = Set.of(ActionAttributeType.IMAGE_SRC_PART);
+        IMAGE_SRC_PART.competingKeys = Set.of(ActionAttributeType.IMAGE_SRC);
+        LINK_URL.competingKeys = Set.of(ActionAttributeType.LINK_URL_PART);
+        LINK_URL_PART.competingKeys = Set.of(ActionAttributeType.LINK_URL);
+        FIELD_TEXT.competingKeys = Set.of(ActionAttributeType.FIELD_TEXT_PART);
+        FIELD_TEXT_PART.competingKeys = Set.of(ActionAttributeType.FIELD_TEXT);
+    }
 
-        SEARCH_TYPES = filterByActionClass(IElementSearchAction.class, t -> Objects.nonNull(t.searchLocatorBuilder));
-        FILTER_TYPES = filterByActionClass(IElementFilterAction.class, t -> false);
+    @Override
+    public String getKey()
+    {
+        return this.name();
     }
 
     @Override
@@ -127,37 +97,8 @@ public enum ActionAttributeType implements IActionAttributeType
     }
 
     @Override
-    public Function<SearchParameters, By> getSearchLocatorBuilder()
+    public Set<IActionAttributeType> getCompetingTypes()
     {
-        return searchLocatorBuilder;
-    }
-
-    @Override
-    public IActionAttributeType getCompetingType()
-    {
-        return competingType;
-    }
-
-    // Checkstyle bug: https://github.com/sevntu-checkstyle/sevntu.checkstyle/issues/166
-    @SuppressWarnings("checkstyle:SimpleAccessorNameNotation")
-    public static Set<ActionAttributeType> getSearchTypes()
-    {
-        return SEARCH_TYPES;
-    }
-
-    // Checkstyle bug: https://github.com/sevntu-checkstyle/sevntu.checkstyle/issues/166
-    @SuppressWarnings("checkstyle:SimpleAccessorNameNotation")
-    public static Set<ActionAttributeType> getFilterTypes()
-    {
-        return FILTER_TYPES;
-    }
-
-    private static Set<ActionAttributeType> filterByActionClass(Class<? extends IElementAction> actionClass,
-            Predicate<ActionAttributeType> orPredicate)
-    {
-        return Stream.of(values())
-                .filter(t -> t.getActionClass() != null && actionClass.isAssignableFrom(t.getActionClass())
-                        || orPredicate.test(t))
-                .collect(Collectors.toSet());
+        return competingKeys;
     }
 }

@@ -23,10 +23,10 @@ import javax.inject.Inject;
 import org.jbehave.core.annotations.When;
 import org.openqa.selenium.WebElement;
 import org.vividus.bdd.monitor.TakeScreenshotOnFailure;
-import org.vividus.bdd.steps.ui.web.validation.IBaseValidations;
+import org.vividus.bdd.steps.ui.validation.IBaseValidations;
+import org.vividus.ui.action.search.SearchAttributes;
 import org.vividus.ui.web.action.IVideoPlayerActions;
 import org.vividus.ui.web.action.search.ActionAttributeType;
-import org.vividus.ui.web.action.search.SearchAttributes;
 import org.vividus.ui.web.util.LocatorUtil;
 
 @TakeScreenshotOnFailure

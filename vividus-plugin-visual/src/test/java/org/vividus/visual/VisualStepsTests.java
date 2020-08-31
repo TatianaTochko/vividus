@@ -53,9 +53,9 @@ import org.vividus.bdd.resource.ResourceLoadException;
 import org.vividus.reporter.event.IAttachmentPublisher;
 import org.vividus.selenium.screenshot.ScreenshotConfiguration;
 import org.vividus.softassert.ISoftAssert;
+import org.vividus.ui.action.search.SearchAttributes;
+import org.vividus.ui.context.IUiContext;
 import org.vividus.ui.web.action.search.ActionAttributeType;
-import org.vividus.ui.web.action.search.SearchAttributes;
-import org.vividus.ui.web.context.IWebUiContext;
 import org.vividus.visual.engine.IVisualTestingEngine;
 import org.vividus.visual.model.VisualActionType;
 import org.vividus.visual.model.VisualCheck;
@@ -90,7 +90,7 @@ class VisualStepsTests
     @Mock
     private IVisualCheckFactory visualCheckFactory;
     @Mock
-    private IWebUiContext webUiContext;
+    private IUiContext uiContext;
 
     @InjectMocks
     private VisualSteps visualSteps;
@@ -105,7 +105,7 @@ class VisualStepsTests
     void shouldAssertCheckResultForCompareAgainstActionAndPublishAttachment() throws IOException
     {
         VisualCheck visualCheck = mockVisualCheckFactory(VisualActionType.COMPARE_AGAINST);
-        mockWebUiContext();
+        mockUiContext();
         when(visualTestingEngine.compareAgainst(visualCheck)).thenReturn(visualCheckResult);
         mockCheckResult();
         visualSteps.runVisualTests(VisualActionType.COMPARE_AGAINST, BASELINE);
@@ -114,16 +114,16 @@ class VisualStepsTests
         verifyCheckResultPublish();
     }
 
-    private void mockWebUiContext()
+    private void mockUiContext()
     {
-        when(webUiContext.getSearchContext()).thenReturn(mock(SearchContext.class));
+        when(uiContext.getSearchContext()).thenReturn(mock(SearchContext.class));
     }
 
     @Test
     void shouldPerformVisualCheckWithCustomConfiguration() throws IOException
     {
         VisualActionType compareAgainst = VisualActionType.COMPARE_AGAINST;
-        mockWebUiContext();
+        mockUiContext();
         ScreenshotConfiguration screenshotConfiguration = mock(ScreenshotConfiguration.class);
         VisualCheck visualCheck = FACTORY.create(BASELINE, compareAgainst);
         when(visualCheckFactory.create(BASELINE, compareAgainst, screenshotConfiguration)).thenReturn(visualCheck);
@@ -139,7 +139,7 @@ class VisualStepsTests
     void shouldRecordFailedAssertionInCaseOfMissingBaseline() throws IOException
     {
         VisualCheck visualCheck = mockVisualCheckFactory(VisualActionType.COMPARE_AGAINST);
-        mockWebUiContext();
+        mockUiContext();
         when(visualTestingEngine.compareAgainst(visualCheck)).thenReturn(visualCheckResult);
         visualSteps.runVisualTests(VisualActionType.COMPARE_AGAINST, BASELINE);
         verify(softAssert, never()).assertTrue(VISUAL_CHECK_PASSED, false);
@@ -151,7 +151,7 @@ class VisualStepsTests
     @Test
     void shouldAssertCheckResultForCompareAgainstActionAndUseStepLevelExclusions() throws IOException
     {
-        mockWebUiContext();
+        mockUiContext();
         ExamplesTable table = mock(ExamplesTable.class);
         Parameters row = mock(Parameters.class);
         when(table.getRows()).thenReturn(List.of(Map.of(K, V)));
@@ -172,7 +172,7 @@ class VisualStepsTests
     @Test
     void shouldRunVisualTestWithStepLevelExclusionsAndCustomScreenshotConfiguration() throws IOException
     {
-        mockWebUiContext();
+        mockUiContext();
         ExamplesTable table = mock(ExamplesTable.class);
         Parameters row = mock(Parameters.class);
         when(table.getRows()).thenReturn(List.of(Map.of(K, V)));
@@ -235,7 +235,7 @@ class VisualStepsTests
     @Test
     void shouldNotAssertResultForEstablishAction() throws IOException
     {
-        mockWebUiContext();
+        mockUiContext();
         VisualCheck visualCheck = mockVisualCheckFactory(VisualActionType.ESTABLISH);
         when(visualTestingEngine.establish(visualCheck)).thenReturn(visualCheckResult);
         visualSteps.runVisualTests(VisualActionType.ESTABLISH, BASELINE);
@@ -262,7 +262,7 @@ class VisualStepsTests
     @MethodSource("exceptionsToCatch")
     void shouldRecordExceptions(Exception exception) throws IOException
     {
-        mockWebUiContext();
+        mockUiContext();
         shouldRecordException(exception);
     }
 

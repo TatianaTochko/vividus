@@ -22,7 +22,7 @@ import java.util.Set;
 
 import org.openqa.selenium.SearchContext;
 import org.vividus.selenium.screenshot.ScreenshotConfiguration;
-import org.vividus.ui.web.action.search.SearchAttributes;
+import org.vividus.ui.action.search.SearchAttributes;
 import org.vividus.visual.screenshot.IgnoreStrategy;
 
 public class VisualCheck

@@ -28,15 +28,15 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.vividus.bdd.monitor.TakeScreenshotOnFailure;
-import org.vividus.bdd.steps.ui.web.validation.IBaseValidations;
-import org.vividus.bdd.steps.ui.web.validation.IDescriptiveSoftAssert;
+import org.vividus.bdd.steps.ui.validation.IBaseValidations;
+import org.vividus.bdd.steps.ui.validation.IDescriptiveSoftAssert;
 import org.vividus.bdd.steps.ui.web.validation.IElementValidations;
-import org.vividus.ui.web.State;
-import org.vividus.ui.web.action.ISearchActions;
+import org.vividus.ui.State;
+import org.vividus.ui.action.ISearchActions;
+import org.vividus.ui.action.search.SearchAttributes;
+import org.vividus.ui.context.IUiContext;
 import org.vividus.ui.web.action.IWebElementActions;
 import org.vividus.ui.web.action.search.ActionAttributeType;
-import org.vividus.ui.web.action.search.SearchAttributes;
-import org.vividus.ui.web.context.IWebUiContext;
 import org.vividus.ui.web.util.LocatorUtil;
 
 @TakeScreenshotOnFailure
@@ -45,7 +45,7 @@ public class WebElementsSteps
     @Inject private IWebElementActions webElementActions;
     @Inject private IBaseValidations baseValidations;
     @Inject private IElementValidations elementValidations;
-    @Inject private IWebUiContext webUiContext;
+    @Inject private IUiContext uiContext;
     @Inject private ISearchActions searchActions;
     @Inject private IDescriptiveSoftAssert descriptiveSoftAssert;
 
@@ -95,7 +95,7 @@ public class WebElementsSteps
         boolean searchFromRoot = getSearchContext() instanceof WebDriver;
         if (!searchFromRoot)
         {
-            elementValidations.assertIfElementContainsText(webUiContext.getSearchContext(WebElement.class), text, true);
+            elementValidations.assertIfElementContainsText(uiContext.getSearchContext(WebElement.class), text, true);
         }
         else
         {
@@ -158,7 +158,7 @@ public class WebElementsSteps
     {
         if (getSearchContext() instanceof WebElement)
         {
-            return elementValidations.assertIfElementContainsText(webUiContext.getSearchContext(WebElement.class), text,
+            return elementValidations.assertIfElementContainsText(uiContext.getSearchContext(WebElement.class), text,
                     false);
         }
         else
@@ -199,6 +199,6 @@ public class WebElementsSteps
 
     protected SearchContext getSearchContext()
     {
-        return webUiContext.getSearchContext();
+        return uiContext.getSearchContext();
     }
 }

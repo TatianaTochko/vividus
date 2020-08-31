@@ -21,11 +21,11 @@ import java.util.List;
 import org.jbehave.core.annotations.When;
 import org.openqa.selenium.WebElement;
 import org.vividus.bdd.monitor.TakeScreenshotOnFailure;
-import org.vividus.bdd.steps.ui.web.validation.IBaseValidations;
+import org.vividus.bdd.steps.ui.validation.IBaseValidations;
 import org.vividus.selenium.element.Checkbox;
+import org.vividus.ui.action.search.SearchAttributes;
 import org.vividus.ui.web.action.CheckboxAction;
 import org.vividus.ui.web.action.IMouseActions;
-import org.vividus.ui.web.action.search.SearchAttributes;
 
 @TakeScreenshotOnFailure
 public class CheckboxSteps

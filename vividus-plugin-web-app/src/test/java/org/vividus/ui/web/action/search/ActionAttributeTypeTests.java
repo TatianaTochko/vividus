@@ -16,57 +16,35 @@
 
 package org.vividus.ui.web.action.search;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
-import java.util.Set;
+import java.util.stream.Stream;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class ActionAttributeTypeTests
 {
-    @Test
-    void getSearchTypes()
+    static Stream<Arguments> dataSet()
     {
-        Set<ActionAttributeType> searchTypes = Set.of(
-                ActionAttributeType.LINK_TEXT,
-                ActionAttributeType.LINK_URL,
-                ActionAttributeType.LINK_URL_PART,
-                ActionAttributeType.CASE_SENSITIVE_TEXT,
-                ActionAttributeType.CASE_INSENSITIVE_TEXT,
-                ActionAttributeType.TOOLTIP,
-                ActionAttributeType.XPATH,
-                ActionAttributeType.CSS_SELECTOR,
-                ActionAttributeType.TAG_NAME,
-                ActionAttributeType.IMAGE_SRC,
-                ActionAttributeType.IMAGE_SRC_PART,
-                ActionAttributeType.BUTTON_NAME,
-                ActionAttributeType.FIELD_NAME,
-                ActionAttributeType.CHECKBOX_NAME,
-                ActionAttributeType.ELEMENT_NAME,
-                ActionAttributeType.ID,
-                ActionAttributeType.CLASS_NAME);
-        assertEquals(searchTypes, ActionAttributeType.getSearchTypes());
+        return Stream.of(
+            arguments(ActionAttributeType.XPATH, "XPath", XpathSearch.class),
+            arguments(ActionAttributeType.ID, "Id", IdSearch.class),
+            arguments(ActionAttributeType.TAG_NAME, "Tag name", TagNameSearch.class)
+        );
     }
 
-    @Test
-    void getFilterTypes()
+    @MethodSource("dataSet")
+    @ParameterizedTest
+    void testWebAttributeType(ActionAttributeType type, String name, Class<?> actionClass)
     {
-        Set<ActionAttributeType> filterTypes = Set.of(
-                ActionAttributeType.LINK_URL,
-                ActionAttributeType.LINK_URL_PART,
-                ActionAttributeType.CASE_SENSITIVE_TEXT,
-                ActionAttributeType.TOOLTIP,
-                ActionAttributeType.IMAGE_SRC_PART,
-                ActionAttributeType.TEXT_PART,
-                ActionAttributeType.PLACEHOLDER,
-                ActionAttributeType.STATE,
-                ActionAttributeType.DROP_DOWN_STATE,
-                ActionAttributeType.VALIDATION_ICON_SOURCE,
-                ActionAttributeType.RELATIVE_TO_PARENT_WIDTH,
-                ActionAttributeType.CLASS_ATTRIBUTE_PART,
-                ActionAttributeType.FIELD_TEXT,
-                ActionAttributeType.FIELD_TEXT_PART,
-                ActionAttributeType.DROP_DOWN_TEXT);
-        assertEquals(filterTypes, ActionAttributeType.getFilterTypes());
+        assertEquals(type.getAttributeName(), name);
+        assertEquals(type.getActionClass(), actionClass);
+        assertThat(type.getCompetingTypes(), empty());
+        assertEquals(type.name(), type.getKey());
     }
 }

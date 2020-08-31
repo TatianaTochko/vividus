@@ -20,7 +20,7 @@ import java.util.Optional;
 
 import org.jbehave.core.annotations.AsParameters;
 import org.openqa.selenium.Point;
-import org.vividus.ui.web.action.search.SearchAttributes;
+import org.vividus.ui.action.search.SearchAttributes;
 
 @AsParameters
 public class Action

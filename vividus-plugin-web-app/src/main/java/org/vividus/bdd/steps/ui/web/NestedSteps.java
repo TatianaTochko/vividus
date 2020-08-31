@@ -31,20 +31,20 @@ import org.openqa.selenium.WebElement;
 import org.vividus.bdd.monitor.TakeScreenshotOnFailure;
 import org.vividus.bdd.steps.ComparisonRule;
 import org.vividus.bdd.steps.SubSteps;
-import org.vividus.bdd.steps.ui.web.validation.IBaseValidations;
+import org.vividus.bdd.steps.ui.validation.IBaseValidations;
 import org.vividus.softassert.ISoftAssert;
+import org.vividus.ui.action.ISearchActions;
+import org.vividus.ui.action.search.SearchAttributes;
+import org.vividus.ui.context.IUiContext;
+import org.vividus.ui.context.SearchContextSetter;
 import org.vividus.ui.web.action.ICssSelectorFactory;
-import org.vividus.ui.web.action.ISearchActions;
 import org.vividus.ui.web.action.search.ActionAttributeType;
-import org.vividus.ui.web.action.search.SearchAttributes;
-import org.vividus.ui.web.context.IWebUiContext;
-import org.vividus.ui.web.context.SearchContextSetter;
 
 @SuppressWarnings("MagicNumber")
 @TakeScreenshotOnFailure
 public class NestedSteps
 {
-    @Inject private IWebUiContext webUiContext;
+    @Inject private IUiContext uiContext;
     @Inject private IBaseValidations baseValidations;
     @Inject private ISearchActions searchActions;
     @Inject private ISoftAssert softAssert;
@@ -86,7 +86,7 @@ public class NestedSteps
             List<String> cssSelectors = cssSelectorFactory.getCssSelectors(elements).collect(Collectors.toList());
             runStepsWithContextReset(() ->
             {
-                webUiContext.putSearchContext(elements.get(0), () -> { });
+                uiContext.putSearchContext(elements.get(0), () -> { });
                 stepsToExecute.execute(Optional.empty());
             });
             IntStream.range(1, cssSelectors.size()).forEach(i -> {
@@ -95,7 +95,7 @@ public class NestedSteps
                                 new SearchAttributes(ActionAttributeType.CSS_SELECTOR, cssSelectors.get(i)));
                 runStepsWithContextReset(() ->
                 {
-                    webUiContext.putSearchContext(element, () -> { });
+                    uiContext.putSearchContext(element, () -> { });
                     stepsToExecute.execute(Optional.empty());
                 });
             });
@@ -153,7 +153,7 @@ public class NestedSteps
 
     private void runStepsWithContextReset(Runnable subStepExecutor)
     {
-        SearchContextSetter contextSetter = webUiContext.getSearchContextSetter();
+        SearchContextSetter contextSetter = uiContext.getSearchContextSetter();
         try
         {
             subStepExecutor.run();
@@ -177,6 +177,6 @@ public class NestedSteps
 
     private int getElementsNumber(SearchAttributes locator)
     {
-        return searchActions.findElements(webUiContext.getSearchContext(), locator).size();
+        return searchActions.findElements(uiContext.getSearchContext(), locator).size();
     }
 }

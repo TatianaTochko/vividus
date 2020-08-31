@@ -39,18 +39,18 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.WebElement;
 import org.vividus.bdd.context.IBddVariableContext;
-import org.vividus.bdd.steps.ui.web.validation.IBaseValidations;
+import org.vividus.bdd.steps.ui.validation.IBaseValidations;
 import org.vividus.bdd.variable.VariableScope;
 import org.vividus.selenium.IWebDriverProvider;
 import org.vividus.softassert.ISoftAssert;
+import org.vividus.ui.action.ISearchActions;
+import org.vividus.ui.action.search.SearchAttributes;
+import org.vividus.ui.action.search.SearchParameters;
+import org.vividus.ui.action.search.Visibility;
+import org.vividus.ui.context.IUiContext;
 import org.vividus.ui.web.action.IJavascriptActions;
-import org.vividus.ui.web.action.ISearchActions;
 import org.vividus.ui.web.action.IWebElementActions;
 import org.vividus.ui.web.action.search.ActionAttributeType;
-import org.vividus.ui.web.action.search.SearchAttributes;
-import org.vividus.ui.web.action.search.SearchParameters;
-import org.vividus.ui.web.action.search.Visibility;
-import org.vividus.ui.web.context.IWebUiContext;
 import org.vividus.ui.web.util.LocatorUtil;
 
 @ExtendWith(MockitoExtension.class)
@@ -92,7 +92,7 @@ class SetVariableStepsTests
     private IBddVariableContext bddVariableContext;
 
     @Mock
-    private IWebUiContext webUiContext;
+    private IUiContext uiContext;
 
     @Mock
     private IWebElementActions webElementActions;
@@ -237,7 +237,7 @@ class SetVariableStepsTests
     void testGetNumberOfElementsByXpathToScenarioVariable()
     {
         SearchAttributes searchAttributes = new SearchAttributes(ActionAttributeType.XPATH, XPATH);
-        when(webUiContext.getSearchContext()).thenReturn(webDriver);
+        when(uiContext.getSearchContext()).thenReturn(webDriver);
         WebElement webElement = mock(WebElement.class);
         when(searchActions.findElements(webDriver, searchAttributes)).thenReturn(Collections.singletonList(webElement));
         setVariableSteps.getNumberOfElementsByXpathToVariable(searchAttributes, VARIABLE_SCOPE, NUMBER_BY_XPATH);
@@ -247,7 +247,7 @@ class SetVariableStepsTests
     @Test
     void testGetNumberOfElementsByXpathToScenarioVariable2()
     {
-        when(webUiContext.getSearchContext()).thenReturn(webDriver);
+        when(uiContext.getSearchContext()).thenReturn(webDriver);
         SearchAttributes searchAttributes = new SearchAttributes(ActionAttributeType.XPATH, XPATH);
         WebElement webElement = mock(WebElement.class);
         when(searchActions.findElements(webDriver, searchAttributes)).thenReturn(Collections.singletonList(webElement));
@@ -258,7 +258,7 @@ class SetVariableStepsTests
     @Test
     void testGetNumberOfElementsByAttributeValueToStoryVariable()
     {
-        when(webUiContext.getSearchContext()).thenReturn(webDriver);
+        when(uiContext.getSearchContext()).thenReturn(webDriver);
         WebElement webElement = mock(WebElement.class);
         SearchAttributes searchAttributes = new SearchAttributes(ActionAttributeType.XPATH,
                 ".//*[normalize-space(@attributeType)=\"attributeValue\"]");
@@ -271,9 +271,9 @@ class SetVariableStepsTests
     @Test
     void testGetTextOfContentToVariable()
     {
-        when(webUiContext.getSearchContext()).thenReturn(webDriver);
+        when(uiContext.getSearchContext()).thenReturn(webDriver);
         WebElement webElement = mock(WebElement.class);
-        when(webUiContext.getSearchContext(WebElement.class)).thenReturn(webElement);
+        when(uiContext.getSearchContext(WebElement.class)).thenReturn(webElement);
         when(webElementActions.getElementText(webElement)).thenReturn(TEXT);
         setVariableSteps.getTextOfContentToVariable(VARIABLE_SCOPE, VARIABLE_NAME);
         verify(bddVariableContext).putVariable(VARIABLE_SCOPE, VARIABLE_NAME, TEXT);
@@ -282,7 +282,7 @@ class SetVariableStepsTests
     @Test
     void testGetTextOfContentToVariableNoContext()
     {
-        when(webUiContext.getSearchContext()).thenReturn(null);
+        when(uiContext.getSearchContext()).thenReturn(null);
         setVariableSteps.getTextOfContentToVariable(VARIABLE_SCOPE, VARIABLE_NAME);
         verify(bddVariableContext).putVariable(VARIABLE_SCOPE, VARIABLE_NAME, null);
     }
@@ -291,8 +291,8 @@ class SetVariableStepsTests
     void testSetAttributeValueToVariable()
     {
         WebElement webElement = mock(WebElement.class);
-        when(webUiContext.getSearchContext()).thenReturn(webElement);
-        when(webUiContext.getSearchContext(WebElement.class)).thenReturn(webElement);
+        when(uiContext.getSearchContext()).thenReturn(webElement);
+        when(uiContext.getSearchContext(WebElement.class)).thenReturn(webElement);
         String attributeName = "attribute";
         String attributeValue = TEXT;
         when(webElement.getAttribute(attributeName)).thenReturn(attributeValue);
@@ -364,7 +364,7 @@ class SetVariableStepsTests
     void shouldCallJSScriptAndSaveValueToContext()
     {
         WebElement table = mock(WebElement.class);
-        when(webUiContext.getSearchContext(WebElement.class)).thenReturn(table);
+        when(uiContext.getSearchContext(WebElement.class)).thenReturn(table);
         List<Map<String, String>> listOfTables = List.of(Map.of("key", VALUE));
         when(javascriptActions.executeScriptFromResource(SetVariableSteps.class, "parse-table.js", table))
                 .thenReturn(listOfTables);

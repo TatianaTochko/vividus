@@ -22,7 +22,7 @@ import java.util.Set;
 
 import com.applitools.eyes.MatchLevel;
 
-import org.vividus.ui.web.action.search.SearchAttributes;
+import org.vividus.ui.action.search.SearchAttributes;
 import org.vividus.visual.model.VisualActionType;
 import org.vividus.visual.model.VisualCheck;
 import org.vividus.visual.screenshot.IgnoreStrategy;

@@ -21,9 +21,16 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebElement;
+import org.vividus.ui.action.search.IActionAttributeType;
+import org.vividus.ui.action.search.IElementFilterAction;
 
-public abstract class AbstractElementFilterAction extends AbstractElementSearchAction implements IElementFilterAction
+public abstract class AbstractElementFilterAction extends AbstractWebElementSearchAction implements IElementFilterAction
 {
+    public AbstractElementFilterAction(IActionAttributeType actionAttributeType)
+    {
+        super(actionAttributeType);
+    }
+
     @Override
     public List<WebElement> filter(List<WebElement> elements, String value)
     {

@@ -37,19 +37,19 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.vividus.bdd.monitor.TakeScreenshotOnFailure;
-import org.vividus.bdd.steps.ui.web.validation.IBaseValidations;
+import org.vividus.bdd.steps.ui.validation.IBaseValidations;
 import org.vividus.selenium.IWebDriverProvider;
 import org.vividus.softassert.ISoftAssert;
-import org.vividus.ui.web.State;
-import org.vividus.ui.web.action.IExpectedConditions;
+import org.vividus.ui.State;
+import org.vividus.ui.action.IExpectedConditions;
+import org.vividus.ui.action.ISearchActions;
+import org.vividus.ui.action.IWaitActions;
+import org.vividus.ui.action.WaitResult;
+import org.vividus.ui.action.search.SearchAttributes;
+import org.vividus.ui.context.IUiContext;
 import org.vividus.ui.web.action.IJavascriptActions;
 import org.vividus.ui.web.action.INavigateActions;
-import org.vividus.ui.web.action.ISearchActions;
-import org.vividus.ui.web.action.IWaitActions;
-import org.vividus.ui.web.action.WaitResult;
 import org.vividus.ui.web.action.search.ActionAttributeType;
-import org.vividus.ui.web.action.search.SearchAttributes;
-import org.vividus.ui.web.context.IWebUiContext;
 import org.vividus.ui.web.util.LocatorUtil;
 
 @TakeScreenshotOnFailure
@@ -61,7 +61,7 @@ public class WaitSteps
     @Inject private IWaitActions waitActions;
     @Inject private ISearchActions searchActions;
     @Inject private INavigateActions navigateActions;
-    @Inject private IWebUiContext webUiContext;
+    @Inject private IUiContext uiContext;
     @Inject private ISoftAssert softAssert;
     @Inject private IExpectedConditions<By> expectedSearchContextConditions;
     @Inject private IExpectedConditions<SearchAttributes> expectedSearchActionsConditions;
@@ -337,7 +337,7 @@ public class WaitSteps
     @When("I wait until a frame with the name '$frameName' appears")
     public void waitTillFrameAppears(String frameName)
     {
-        WebDriver searchContext = webUiContext.getSearchContext(WebDriver.class);
+        WebDriver searchContext = uiContext.getSearchContext(WebDriver.class);
         waitForElementAppearance(searchContext, LocatorUtil
                 .getXPathLocator("*[(local-name()='frame' or local-name()='iframe') and @*='%s']", frameName));
     }
@@ -498,7 +498,7 @@ public class WaitSteps
             {
                 navigateActions.refresh(driver);
                 SearchAttributes attributes = new SearchAttributes(ActionAttributeType.CASE_SENSITIVE_TEXT, textToFind);
-                List<WebElement> elements = searchActions.findElements(webUiContext.getSearchContext(WebDriver.class),
+                List<WebElement> elements = searchActions.findElements(uiContext.getSearchContext(WebDriver.class),
                         attributes);
                 return displayed == !elements.isEmpty();
             }
@@ -531,6 +531,6 @@ public class WaitSteps
 
     private SearchContext getSearchContext()
     {
-        return webUiContext.getSearchContext();
+        return uiContext.getSearchContext();
     }
 }

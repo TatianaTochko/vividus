@@ -36,19 +36,19 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.ResourceUtils;
 import org.vividus.bdd.monitor.TakeScreenshotOnFailure;
 import org.vividus.bdd.steps.ComparisonRule;
-import org.vividus.bdd.steps.ui.web.validation.IBaseValidations;
-import org.vividus.bdd.steps.ui.web.validation.IDescriptiveSoftAssert;
+import org.vividus.bdd.steps.ui.validation.IBaseValidations;
+import org.vividus.bdd.steps.ui.validation.IDescriptiveSoftAssert;
 import org.vividus.bdd.steps.ui.web.validation.IElementValidations;
 import org.vividus.selenium.IWebDriverProvider;
-import org.vividus.ui.web.State;
+import org.vividus.ui.State;
+import org.vividus.ui.action.search.SearchAttributes;
+import org.vividus.ui.action.search.SearchParameters;
+import org.vividus.ui.action.search.Visibility;
+import org.vividus.ui.context.IUiContext;
 import org.vividus.ui.web.action.ClickResult;
 import org.vividus.ui.web.action.IMouseActions;
 import org.vividus.ui.web.action.IWebElementActions;
 import org.vividus.ui.web.action.search.ActionAttributeType;
-import org.vividus.ui.web.action.search.SearchAttributes;
-import org.vividus.ui.web.action.search.SearchParameters;
-import org.vividus.ui.web.action.search.Visibility;
-import org.vividus.ui.web.context.IWebUiContext;
 import org.vividus.ui.web.util.LocatorUtil;
 
 @TakeScreenshotOnFailure
@@ -63,7 +63,7 @@ public class ElementSteps implements ResourceLoaderAware
     @Inject private IDescriptiveSoftAssert descriptiveSoftAssert;
     @Inject private IWebDriverProvider webDriverProvider;
     @Inject private IBaseValidations baseValidations;
-    @Inject private IWebUiContext webUiContext;
+    @Inject private IUiContext uiContext;
     @Inject private IElementValidations elementValidations;
     @Inject private IMouseActions mouseActions;
     private ResourceLoader resourceLoader;
@@ -195,7 +195,7 @@ public class ElementSteps implements ResourceLoaderAware
     @Then("the context element has the CSS property '$cssName'='$cssValue'")
     public void doesElementHaveRightCss(String cssName, String cssValue)
     {
-        WebElement element = webUiContext.getSearchContext(WebElement.class);
+        WebElement element = uiContext.getSearchContext(WebElement.class);
         String actualCssValue = webElementActions.getCssValue(element, cssName);
         descriptiveSoftAssert.assertEquals("Element has correct css property value", cssValue,
                 actualCssValue);
@@ -209,7 +209,7 @@ public class ElementSteps implements ResourceLoaderAware
     @Then("the context element has the CSS property '$cssName' containing '$cssValue'")
     public void doesElementHaveRightPartOfCssValue(String cssName, String cssValue)
     {
-        WebElement element = webUiContext.getSearchContext(WebElement.class);
+        WebElement element = uiContext.getSearchContext(WebElement.class);
         String actualCssValue = webElementActions.getCssValue(element, cssName);
         descriptiveSoftAssert.assertThat("Css property value part is correct",
                 String.format("Element has CSS property '%1$s' containing value '%2$s'", cssName, cssValue),
@@ -274,7 +274,7 @@ public class ElementSteps implements ResourceLoaderAware
     @Then("the context has a width of '$widthInPerc'%")
     public void isElementHasRightWidth(int widthInPerc)
     {
-        WebElement webElement = webUiContext.getSearchContext(WebElement.class);
+        WebElement webElement = uiContext.getSearchContext(WebElement.class);
         WebElement bodyElement = baseValidations.assertIfElementExists("'Body' element", webDriverProvider.get(),
                 new SearchAttributes(ActionAttributeType.XPATH,
                         new SearchParameters(LocatorUtil.getXPath("//body"), Visibility.ALL)));
@@ -288,7 +288,7 @@ public class ElementSteps implements ResourceLoaderAware
     @Then("the context element has a width of '$widthInPerc'% relative to the parent element")
     public void isElementHasWidthRelativeToTheParentElement(int width)
     {
-        WebElement elementChild = webUiContext.getSearchContext(WebElement.class);
+        WebElement elementChild = uiContext.getSearchContext(WebElement.class);
         WebElement elementParent = baseValidations.assertIfElementExists("Parent element",
                 new SearchAttributes(ActionAttributeType.XPATH, "./.."));
         elementValidations.assertIfElementHasWidthInPerc(elementParent, elementChild, width);

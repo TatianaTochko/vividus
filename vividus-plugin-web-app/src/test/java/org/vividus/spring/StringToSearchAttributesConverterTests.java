@@ -17,18 +17,28 @@
 package org.vividus.spring;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
-import org.vividus.ui.web.action.search.ActionAttributeType;
-import org.vividus.ui.web.action.search.SearchAttributes;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.vividus.ui.action.search.SearchAttributes;
+import org.vividus.ui.util.SearchAttributesConversionUtils;
 
+@ExtendWith(MockitoExtension.class)
 class StringToSearchAttributesConverterTests
 {
-    private final StringToSearchAttributesConverter converter = new StringToSearchAttributesConverter();
+    @Mock private SearchAttributesConversionUtils conversionUtils;
+    @Mock private SearchAttributes searchAttributes;
+    @InjectMocks private StringToSearchAttributesConverter converter;
 
     @Test
     void testConvert()
     {
-        assertEquals(new SearchAttributes(ActionAttributeType.ID, "id"), converter.convert("By.id(id)"));
+        String value = "value";
+        when(conversionUtils.convertToSearchAttributes(value)).thenReturn(searchAttributes);
+        assertEquals(searchAttributes, converter.convert(value));
     }
 }

@@ -59,19 +59,19 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.ResourceUtils;
 import org.vividus.bdd.steps.ComparisonRule;
-import org.vividus.bdd.steps.ui.web.validation.IBaseValidations;
-import org.vividus.bdd.steps.ui.web.validation.IDescriptiveSoftAssert;
+import org.vividus.bdd.steps.ui.validation.IBaseValidations;
+import org.vividus.bdd.steps.ui.validation.IDescriptiveSoftAssert;
 import org.vividus.bdd.steps.ui.web.validation.IElementValidations;
 import org.vividus.selenium.IWebDriverProvider;
-import org.vividus.ui.web.State;
+import org.vividus.ui.State;
+import org.vividus.ui.action.search.SearchAttributes;
+import org.vividus.ui.action.search.SearchParameters;
+import org.vividus.ui.action.search.Visibility;
+import org.vividus.ui.context.IUiContext;
 import org.vividus.ui.web.action.ClickResult;
 import org.vividus.ui.web.action.IMouseActions;
 import org.vividus.ui.web.action.WebElementActions;
 import org.vividus.ui.web.action.search.ActionAttributeType;
-import org.vividus.ui.web.action.search.SearchAttributes;
-import org.vividus.ui.web.action.search.SearchParameters;
-import org.vividus.ui.web.action.search.Visibility;
-import org.vividus.ui.web.context.IWebUiContext;
 import org.vividus.ui.web.util.LocatorUtil;
 
 @RunWith(PowerMockRunner.class)
@@ -116,7 +116,7 @@ public class ElementStepsTests
     private IElementValidations elementValidations;
 
     @Mock
-    private IWebUiContext webUiContext;
+    private IUiContext uiContext;
 
     @Mock
     private WebElementActions webElementActions;
@@ -145,7 +145,7 @@ public class ElementStepsTests
     public void before()
     {
         MockitoAnnotations.initMocks(this);
-        when(webUiContext.getSearchContext()).thenReturn(webElement);
+        when(uiContext.getSearchContext()).thenReturn(webElement);
         when(webDriverProvider.get()).thenReturn(webDriver);
         elementsList = new ArrayList<>();
         elementsList.add(webElement);
@@ -195,7 +195,7 @@ public class ElementStepsTests
     public void testIsElementHasRightWidth()
     {
         int widthInPerc = 50;
-        when(webUiContext.getSearchContext(WebElement.class)).thenReturn(webElement);
+        when(uiContext.getSearchContext(WebElement.class)).thenReturn(webElement);
         when(baseValidations.assertIfElementExists("'Body' element", webDriverProvider.get(),
                 new SearchAttributes(ActionAttributeType.XPATH, new SearchParameters("//body", Visibility.ALL))))
                 .thenReturn(bodyElement);
@@ -207,7 +207,7 @@ public class ElementStepsTests
     public void testIsElementHasWidthRelativeToTheParentElement()
     {
         int width = 50;
-        when(webUiContext.getSearchContext(WebElement.class)).thenReturn(webElement);
+        when(uiContext.getSearchContext(WebElement.class)).thenReturn(webElement);
         when(baseValidations.assertIfElementExists("Parent element", new SearchAttributes(ActionAttributeType.XPATH,
                 "./.."))).thenReturn(webElement);
         elementSteps.isElementHasWidthRelativeToTheParentElement(width);
@@ -225,7 +225,7 @@ public class ElementStepsTests
     @Test
     public void testIsNullElementHasRightCss()
     {
-        when(webUiContext.getSearchContext()).thenReturn(null);
+        when(uiContext.getSearchContext()).thenReturn(null);
         when(webElementActions.getCssValue(webElement, CSS_NAME)).thenReturn(CSS_VALUE);
         elementSteps.doesElementHaveRightCss(CSS_NAME, CSS_VALUE);
         verify(softAssert).assertEquals(ELEMENT_HAS_CORRECT_CSS_PROPERTY_VALUE, CSS_VALUE, null);
@@ -285,7 +285,7 @@ public class ElementStepsTests
     {
         Dimension dimension = Dimension.HEIGHT;
         elementsList.add(webElement);
-        when(webUiContext.getSearchContext()).thenReturn(searchContext);
+        when(uiContext.getSearchContext()).thenReturn(searchContext);
         SearchAttributes searchAttributes = new SearchAttributes(ActionAttributeType.XPATH, XPATH);
         when(baseValidations.assertIfAtLeastNumberOfElementsExist(THE_NUMBER_OF_FOUND_ELEMENTS, searchAttributes, 2))
                 .thenReturn(elementsList);
@@ -445,7 +445,7 @@ public class ElementStepsTests
 
     private void mockWebElementCssValue()
     {
-        when(webUiContext.getSearchContext(WebElement.class)).thenReturn(webElement);
+        when(uiContext.getSearchContext(WebElement.class)).thenReturn(webElement);
         when(webElementActions.getCssValue(webElement, CSS_NAME)).thenReturn(CSS_VALUE);
     }
 

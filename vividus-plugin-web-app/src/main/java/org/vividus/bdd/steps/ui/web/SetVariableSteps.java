@@ -31,17 +31,17 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.vividus.bdd.context.IBddVariableContext;
 import org.vividus.bdd.monitor.TakeScreenshotOnFailure;
-import org.vividus.bdd.steps.ui.web.validation.IBaseValidations;
+import org.vividus.bdd.steps.ui.validation.IBaseValidations;
 import org.vividus.bdd.variable.VariableScope;
 import org.vividus.selenium.IWebDriverProvider;
 import org.vividus.softassert.ISoftAssert;
+import org.vividus.ui.action.ISearchActions;
+import org.vividus.ui.action.search.SearchAttributes;
+import org.vividus.ui.action.search.Visibility;
+import org.vividus.ui.context.IUiContext;
 import org.vividus.ui.web.action.IJavascriptActions;
-import org.vividus.ui.web.action.ISearchActions;
 import org.vividus.ui.web.action.IWebElementActions;
 import org.vividus.ui.web.action.search.ActionAttributeType;
-import org.vividus.ui.web.action.search.SearchAttributes;
-import org.vividus.ui.web.action.search.Visibility;
-import org.vividus.ui.web.context.IWebUiContext;
 import org.vividus.ui.web.util.LocatorUtil;
 import org.vividus.util.UriUtils;
 
@@ -57,7 +57,7 @@ public class SetVariableSteps
 
     @Inject private IBddVariableContext bddVariableContext;
 
-    @Inject private IWebUiContext webUiContext;
+    @Inject private IUiContext uiContext;
     @Inject private IWebElementActions webElementActions;
     @Inject private IJavascriptActions javascriptActions;
 
@@ -407,7 +407,7 @@ public class SetVariableSteps
     public void saveTableToContext(Set<VariableScope> scopes, String variableName)
     {
         List<Map<String, Object>> table = javascriptActions.executeScriptFromResource(SetVariableSteps.class,
-                "parse-table.js", webUiContext.getSearchContext(WebElement.class));
+                "parse-table.js", uiContext.getSearchContext(WebElement.class));
         bddVariableContext.putVariable(scopes, variableName, table);
     }
 
@@ -453,7 +453,7 @@ public class SetVariableSteps
             Set<VariableScope> scopes, String variableName)
     {
         Object value = Optional.ofNullable(getSearchContext())
-                .map(context -> webUiContext.getSearchContext(WebElement.class)).map(contextElementProcessor)
+                .map(context -> uiContext.getSearchContext(WebElement.class)).map(contextElementProcessor)
                 .orElse(null);
         saveVariable(scopes, variableName, value);
     }
@@ -483,6 +483,6 @@ public class SetVariableSteps
 
     private SearchContext getSearchContext()
     {
-        return webUiContext.getSearchContext();
+        return uiContext.getSearchContext();
     }
 }

@@ -27,8 +27,8 @@ import java.util.stream.Stream;
 import org.vividus.selenium.IWebDriverProvider;
 import org.vividus.selenium.screenshot.IScreenshotTaker;
 import org.vividus.selenium.screenshot.ScreenshotDebugger;
-import org.vividus.ui.web.action.ISearchActions;
-import org.vividus.ui.web.action.search.SearchAttributes;
+import org.vividus.ui.action.ISearchActions;
+import org.vividus.ui.action.search.SearchAttributes;
 import org.vividus.visual.model.VisualCheck;
 
 import ru.yandex.qatools.ashot.Screenshot;

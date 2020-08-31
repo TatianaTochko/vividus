@@ -19,14 +19,21 @@ package org.vividus.spring;
 import java.util.Set;
 
 import org.springframework.core.convert.converter.Converter;
-import org.vividus.ui.web.action.search.SearchAttributes;
-import org.vividus.ui.web.util.SearchAttributesConversionUtils;
+import org.vividus.ui.action.search.SearchAttributes;
+import org.vividus.ui.util.SearchAttributesConversionUtils;
 
 public class StringToSearchAttributesSetConverter implements Converter<String, Set<SearchAttributes>>
 {
+    private SearchAttributesConversionUtils conversionUtils;
+
     @Override
     public Set<SearchAttributes> convert(String source)
     {
-        return SearchAttributesConversionUtils.convertToSearchAttributesSet(source);
+        return conversionUtils.convertToSearchAttributesSet(source);
+    }
+
+    public void setConversionUtils(SearchAttributesConversionUtils conversionUtils)
+    {
+        this.conversionUtils = conversionUtils;
     }
 }

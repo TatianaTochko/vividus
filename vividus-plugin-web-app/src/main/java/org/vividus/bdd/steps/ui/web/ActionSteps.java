@@ -26,13 +26,13 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.vividus.bdd.monitor.TakeScreenshotOnFailure;
+import org.vividus.bdd.steps.ui.validation.IBaseValidations;
 import org.vividus.bdd.steps.ui.web.model.Action;
 import org.vividus.bdd.steps.ui.web.model.ActionType;
 import org.vividus.bdd.steps.ui.web.model.SequenceAction;
-import org.vividus.bdd.steps.ui.web.validation.IBaseValidations;
 import org.vividus.selenium.IWebDriverProvider;
 import org.vividus.softassert.ISoftAssert;
-import org.vividus.ui.web.action.search.SearchAttributes;
+import org.vividus.ui.action.search.SearchAttributes;
 
 @TakeScreenshotOnFailure
 public class ActionSteps

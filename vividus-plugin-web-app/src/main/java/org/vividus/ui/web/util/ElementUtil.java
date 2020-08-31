@@ -22,15 +22,19 @@ import java.util.function.Supplier;
 import com.google.common.base.Suppliers;
 
 import org.openqa.selenium.WebElement;
-import org.vividus.ui.web.action.SearchActions;
+import org.vividus.ui.action.SearchActions;
+import org.vividus.ui.util.SearchAttributesConversionUtils;
 
-public final class ElementUtil
+public class ElementUtil
 {
     public static final int ACCURACY = 2;
     public static final double HUNDRED = 100;
 
-    private ElementUtil()
+    private final SearchAttributesConversionUtils conversionUtils;
+
+    public ElementUtil(SearchAttributesConversionUtils conversionUtils)
     {
+        this.conversionUtils = conversionUtils;
     }
 
     public static long getElementWidthInPerc(WebElement parent, WebElement element)
@@ -40,9 +44,9 @@ public final class ElementUtil
         return Math.round(elementWidth / parentWidth * HUNDRED);
     }
 
-    public static Supplier<Optional<WebElement>> getElement(String searchAttributes, SearchActions searchActions)
+    public Supplier<Optional<WebElement>> getElement(String searchAttributes, SearchActions searchActions)
     {
         return Suppliers.memoize(() ->
-            searchActions.findElement(SearchAttributesConversionUtils.convertToSearchAttributes(searchAttributes)));
+            searchActions.findElement(conversionUtils.convertToSearchAttributes(searchAttributes)));
     }
 }
