@@ -37,14 +37,6 @@ jobs:
         submodules: recursive
         fetch-depth: 0
 
-    - name: Cache ~/.gradle/caches
-      uses: actions/cache@v2
-      with:
-        path: ~/.gradle/caches
-        key: ${{ runner.os }}-gradle-caches-${{ hashFiles('**/*.gradle') }}
-        restore-keys: |
-          ${{ runner.os }}-gradle-caches-
-
     - name: Cache ~/.gradle/wrapper
       uses: actions/cache@v2
       with:
@@ -52,15 +44,6 @@ jobs:
         key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('vividus-build-system/**/wrapper/gradle-wrapper.properties') }}
         restore-keys: |
           ${{ runner.os }}-gradle-wrapper-
-
-    - name: Cache tests history
-      if: github.ref == 'refs/heads/master' && matrix.platform == 'ubuntu-latest'
-      uses: pat-s/always-upload-cache@v2.1.5
-      with:
-        path: vividus-tests/output/history
-        key: tests-history-cache-${{ github.sha }}
-        restore-keys: |
-          tests-history-cache-
 
     - name: Set up JDK 16
       uses: actions/setup-java@v2
