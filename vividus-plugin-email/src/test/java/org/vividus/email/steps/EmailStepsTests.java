@@ -16,10 +16,6 @@
 
 package org.vividus.email.steps;
 
-import static com.github.valfirst.slf4jtest.LoggingEvent.info;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -32,10 +28,6 @@ import java.util.Set;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
-
-import com.github.valfirst.slf4jtest.TestLogger;
-import com.github.valfirst.slf4jtest.TestLoggerFactory;
-import com.github.valfirst.slf4jtest.TestLoggerFactoryExtension;
 
 import org.apache.commons.lang3.function.FailablePredicate;
 import org.junit.jupiter.api.AfterEach;
@@ -57,7 +49,7 @@ import org.vividus.softassert.ISoftAssert;
 import org.vividus.util.property.PropertyMappedCollection;
 import org.vividus.variable.VariableScope;
 
-@ExtendWith({ MockitoExtension.class, TestLoggerFactoryExtension.class })
+@ExtendWith(MockitoExtension.class)
 class EmailStepsTests
 {
     private static final String CONFIG_KEY = "config_key";
@@ -77,8 +69,6 @@ class EmailStepsTests
     private FailablePredicate<Message, MessagingException> filter;
 
     private EmailSteps steps;
-
-    private final TestLogger logger = TestLoggerFactory.getTestLogger(EmailSteps.class);
 
     @BeforeEach
     void init()
@@ -107,7 +97,6 @@ class EmailStepsTests
 
         steps.saveMessageContent(CONFIG_KEY, List.of(filter), Set.of(VariableScope.STORY), VAR_KEY);
 
-        assertThat(logger.getLoggingEvents(), is(List.of(info("Content {} by index '{}'", contentType, 0))));
         verify(variableContext).putVariable(Set.of(VariableScope.STORY), VAR_KEY + "[0]", text);
         verifyNoMoreInteractions(softAssert, messageFetchService, variableContext);
     }
@@ -124,7 +113,6 @@ class EmailStepsTests
 
             verify(softAssert).recordFailedAssertion("No messages were found by the specified filters");
             verifyNoMoreInteractions(softAssert, messageFetchService, variableContext);
-            assertThat(logger.getLoggingEvents(), empty());
         }
 
         @Test
@@ -153,7 +141,6 @@ class EmailStepsTests
             verify(softAssert).recordFailedAssertion(
                     String.format("Expected one message, but found 2:%n%s%s", assertionFirst, assertionSecond));
             verifyNoMoreInteractions(softAssert, messageFetchService, variableContext);
-            assertThat(logger.getLoggingEvents(), empty());
         }
 
         @Test
@@ -167,7 +154,6 @@ class EmailStepsTests
             verify(softAssert).assertThat(eq(TEXT_ENTRIES_MSG), eq(List.of()),
                     argThat(arg -> COLLECTION_MATCHER_MSG.equals(arg.toString())));
             verifyNoMoreInteractions(softAssert, messageFetchService, variableContext);
-            assertThat(logger.getLoggingEvents(), empty());
         }
     }
 }

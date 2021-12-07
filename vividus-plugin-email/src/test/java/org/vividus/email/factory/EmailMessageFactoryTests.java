@@ -16,17 +16,14 @@
 
 package org.vividus.email.factory;
 
-import static com.github.valfirst.slf4jtest.LoggingEvent.info;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.mail.BodyPart;
 import javax.mail.Message;
@@ -34,9 +31,6 @@ import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
-
-import com.github.valfirst.slf4jtest.TestLogger;
-import com.github.valfirst.slf4jtest.TestLoggerFactory;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -56,8 +50,6 @@ class EmailMessageFactoryTests
 
     @InjectMocks
     private EmailMessageFactory factory;
-
-    private final TestLogger logger = TestLoggerFactory.getTestLogger(EmailMessageFactory.class);
 
     @Test
     void testTextContent() throws EmailMessageCreationException, MessagingException, IOException
@@ -119,9 +111,6 @@ class EmailMessageFactoryTests
 
         EmailMessage output = factory.create(message);
         verifyMessage(output, messageMock);
-        assertThat(logger.getLoggingEvents(), is(List.of(
-                info("Skip saving of attachment with the name " + fileName),
-                info("Skip saving of content with the content type '{}'", zipContentType))));
     }
 
     private void verifyMessage(EmailMessage output, MessageMock messageMock) throws MessagingException

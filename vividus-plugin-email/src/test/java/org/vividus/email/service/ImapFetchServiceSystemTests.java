@@ -27,6 +27,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import javax.mail.Message;
@@ -75,8 +76,10 @@ class ImapFetchServiceSystemTests
         long timeout = 20000L;
         ServerSetup smtpsSetup = ServerSetupTest.SMTPS;
         smtpsSetup.setServerStartupTimeout(timeout);
+        smtpsSetup.configureJavaMailSessionProperties(new Properties(), true);
         ServerSetup imapsSetup = ServerSetupTest.IMAPS;
         imapsSetup.setServerStartupTimeout(timeout);
+        imapsSetup.configureJavaMailSessionProperties(new Properties(), true);
         mailServer = new GreenMail(new ServerSetup[] { smtpsSetup, imapsSetup });
         mailServer.start();
         mailUser = mailServer.setUser(USERNAME_ADDR, USER_LOGIN, USER_PASS);
