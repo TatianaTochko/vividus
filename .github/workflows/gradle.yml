@@ -63,7 +63,7 @@ jobs:
             ./gradlew clean build sonarqube -Dsonar.host.url=https://sonarcloud.io \
                                       -Dsonar.organization=vividus \
                                       -Dsonar.projectKey=vividus-framework_vividus \
-                                      -Dorg.gradle.jvmargs="-Xmx2g -XX:MaxMetaspaceSize=768m" \
+                                      -Dorg.gradle.jvmargs="-Xmx1g -XX:MaxMetaspaceSize=768m" \
                                       -Ptest.testLogging.exceptionFormat=full \
                                       -i
           else
@@ -74,5 +74,5 @@ jobs:
         else
           ./gradlew clean build -x spotbugsMain -x spotbugsTest -x spotbugsIntegrationTest \
                           -x pmdMain -x pmdTest -x pmdIntegrationTest \
-                          -Ptest.testLogging.exceptionFormat=full --no-daemon -i
+                          -Ptest.testLogging.exceptionFormat=full --no-daemon -i -Dorg.gradle.jvmargs="-Xmx1g -XX:MaxMetaspaceSize=768m"
         fi
