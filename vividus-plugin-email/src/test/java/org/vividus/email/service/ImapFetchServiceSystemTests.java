@@ -62,11 +62,12 @@ class ImapFetchServiceSystemTests
     private static final String USER_PASS = "password";
     private static final String USERNAME_ADDR = "username@localhost";
     private static final String SENDER = "sender@localhost";
+    private static final String INBOX = "INBOX";
 
     private static GreenMail mailServer;
     private static GreenMailUser mailUser;
 
-    private final EmailFetchService service = new ImapFetchService(Duration.ofSeconds(30), 6, "INBOX",
+    private final EmailFetchService service = new ImapFetchService(Duration.ofSeconds(90), 15, INBOX,
             new EmailMessageFactory());
 
     @BeforeAll
@@ -136,8 +137,10 @@ class ImapFetchServiceSystemTests
                 .createFilter(ComparisonRule.EQUAL_TO.name(), subject);
 
         List<EmailMessage> receivedMessages = new ArrayList<>();
+        ImapFetchService testService = new ImapFetchService(Duration.ofSeconds(5), 1, INBOX,
+                new EmailMessageFactory());
         assertTimeout(Duration.ofMinutes(1),
-            () -> receivedMessages.addAll(service.fetch(List.of(subjectPredicate), getConfig())));
+            () -> receivedMessages.addAll(testService.fetch(List.of(subjectPredicate), getConfig())));
 
         assertThat(receivedMessages, hasSize(0));
     }
