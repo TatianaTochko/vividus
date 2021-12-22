@@ -23,6 +23,7 @@ import javax.validation.constraints.NotBlank;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.vividus.zephyr.model.TestCaseStatus;
+import org.vividus.zephyr.model.TestLevel;
 
 @ConfigurationProperties("zephyr.exporter")
 public class ZephyrExporterProperties
@@ -35,6 +36,8 @@ public class ZephyrExporterProperties
     private boolean updateExecutionStatusesOnly;
 
     private List<TestCaseStatus> statusesOfTestCasesToAddToExecution;
+
+    private TestLevel level;
 
     public String getJiraInstanceKey()
     {
@@ -74,5 +77,15 @@ public class ZephyrExporterProperties
     public void setStatusesOfTestCasesToAddToExecution(List<TestCaseStatus> statusesOfTestCasesToAddToExecution)
     {
         this.statusesOfTestCasesToAddToExecution = statusesOfTestCasesToAddToExecution;
+    }
+
+    public TestLevel getLevel()
+    {
+        return level;
+    }
+
+    public void setLevel(TestLevel level)
+    {
+        this.level = level;
     }
 }

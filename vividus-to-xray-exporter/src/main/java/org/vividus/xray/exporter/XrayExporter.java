@@ -32,8 +32,7 @@ import java.util.stream.IntStream;
 import org.apache.commons.lang3.function.FailableBiFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.vividus.common.CommonExporterFacade;
 import org.vividus.jira.JiraConfigurationException;
 import org.vividus.model.jbehave.NotUniqueMetaValueException;
 import org.vividus.model.jbehave.Scenario;
@@ -55,15 +54,15 @@ import org.vividus.xray.model.AbstractTestCase;
 import org.vividus.xray.model.TestCaseType;
 import org.vividus.xray.model.TestExecution;
 
-@Component
 public class XrayExporter
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XrayExporter.class);
 
-    @Autowired private XrayExporterOptions xrayExporterOptions;
-    @Autowired private XrayFacade xrayFacade;
-    @Autowired private TestCaseFactory testCaseFactory;
-    @Autowired private TestExecutionFactory testExecutionFactory;
+    private final XrayExporterOptions xrayExporterOptions;
+    private final XrayFacade xrayFacade;
+    private TestCaseFactory testCaseFactory;
+    private final TestExecutionFactory testExecutionFactory;
+    private final CommonExporterFacade commonExporterFacade;
 
     private final List<String> errors = new ArrayList<>();
 
@@ -76,6 +75,16 @@ public class XrayExporter
         TestCaseType.MANUAL, this::createManualTestCaseParameters,
         TestCaseType.CUCUMBER, (title, scenario) -> createCucumberTestCaseParameters(scenario)
     );
+
+    public XrayExporter(XrayExporterOptions xrayExporterOptions, XrayFacade xrayFacade, TestCaseFactory testCaseFactory,
+                        TestExecutionFactory testExecutionFactory, CommonExporterFacade commonExporterFacade)
+    {
+        this.xrayExporterOptions = xrayExporterOptions;
+        this.xrayFacade = xrayFacade;
+        this.testCaseFactory = testCaseFactory;
+        this.testExecutionFactory = testExecutionFactory;
+        this.commonExporterFacade = commonExporterFacade;
+    }
 
     public void exportResults() throws IOException
     {
@@ -228,7 +237,7 @@ public class XrayExporter
         Optional<String> requirementId = scenario.getUniqueMetaValue("requirementId");
         if (requirementId.isPresent())
         {
-            xrayFacade.createTestsLink(testCaseId, requirementId.get());
+            commonExporterFacade.createTestsLink(testCaseId, requirementId.get());
         }
     }
 
