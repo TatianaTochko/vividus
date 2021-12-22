@@ -90,20 +90,6 @@ class XrayFacadeTests
     }
 
     @Test
-    void shouldCreateTestsLink() throws IOException, JiraConfigurationException
-    {
-        initializeFacade(List.of());
-        String requirementId = "requirement id";
-        String linkType = "Tests";
-
-        xrayFacade.createTestsLink(ISSUE_ID, requirementId);
-
-        verify(jiraFacade).createIssueLink(ISSUE_ID, requirementId, linkType);
-        assertThat(logger.getLoggingEvents(),
-                is(List.of(info("Create '{}' link from {} to {}", linkType, ISSUE_ID, requirementId))));
-    }
-
-    @Test
     void shouldUpdateManualTestCase() throws IOException, NonEditableIssueStatusException, JiraConfigurationException
     {
         initializeFacade(List.of(OPEN_STATUS));

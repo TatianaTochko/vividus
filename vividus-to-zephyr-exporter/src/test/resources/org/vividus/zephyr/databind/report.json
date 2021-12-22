@@ -1,0 +1,28 @@
+{
+  "fields": {
+    "project": {
+      "key": "project key"
+    },
+    "issuetype": {
+      "name": "Test"
+    },
+    "labels": [
+      "label 1",
+      "label 2"
+    ],
+    "components": [
+      {
+        "name": "component 1"
+      },
+      {
+        "name": "component 2"
+      }
+    ],
+    "story-type": {
+      "value": "Task"
+    },
+    "status": {
+      "name": "Backlog"
+    }
+  }
+}

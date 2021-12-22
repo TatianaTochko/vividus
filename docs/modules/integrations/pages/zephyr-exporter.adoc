@@ -18,6 +18,10 @@ include::partial$jira-configuration.adoc[]
 |Required
 |Description
 
+|`zephyr.exporter.level`
+|true
+|Property to export stories on STORY or SCENARIO level
+
 |`zephyr.exporter.jira-instance-key`
 |false
 |The key of the configured JIRA instance, in case of missing value it will be evaluated automatically based on issue keys being exported
@@ -51,6 +55,30 @@ include::partial$jira-configuration.adoc[]
 |Folder name where new test executions should be created
 
 |===
+
+== Jira Fields Mapping
+
+The Zephyr is a Jira plugin that uses custom Jira fields for it's data, one of the ways to find out custom field names for particular field used by Zephyr on Jira UI (if access to Jira configuration is prohibited) is to request description of some issue.
+
+=== Test Case Properties
+
+image::zephyr.png[Zephyr test case view]
+
+[cols="1,2", options="header"]
+|===
+
+|Property
+|Description
+
+|`jira.fields-mapping.story-type`
+|Key of a field containing story type
+
+|`jira.fields-mapping.test-step`
+|Key of a field containing step of cucumber story/scenario
+
+|===
+
+include::partial$authentication.adoc[]
 
 == Zephyr Execution Status Mapping
 

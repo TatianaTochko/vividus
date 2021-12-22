@@ -62,6 +62,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.vividus.common.CommonExporterFacade;
 import org.vividus.jira.JiraConfigurationException;
 import org.vividus.model.jbehave.NotUniqueMetaValueException;
 import org.vividus.model.jbehave.Scenario;
@@ -100,6 +101,7 @@ class XrayExporterTests
     @Spy private XrayExporterOptions xrayExporterOptions;
     @Mock private TestCaseFactory testCaseFactory;
     @Mock private XrayFacade xrayFacade;
+    @Mock private CommonExporterFacade commonExporterFacade;
     @Mock private TestExecutionFactory testExecutionFactory;
     @InjectMocks private XrayExporter xrayExporter;
 
@@ -255,7 +257,7 @@ class XrayExporterTests
 
         xrayExporter.exportResults();
 
-        verify(xrayFacade).createTestsLink(ISSUE_ID, "STUB-REQ-0");
+        verify(commonExporterFacade).createTestsLink(ISSUE_ID, "STUB-REQ-0");
 
         verifyManualTestCaseParameters(Set.of(), Set.of());
         validateLogs(jsonResultsUri, getExportingScenarioEvent(), getExportSuccessfulEvent());

@@ -16,18 +16,30 @@
 
 package org.vividus.zephyr.facade;
 
+import static com.github.valfirst.slf4jtest.LoggingEvent.info;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.EnumMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.github.valfirst.slf4jtest.TestLogger;
+import com.github.valfirst.slf4jtest.TestLoggerFactory;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,7 +56,10 @@ import org.vividus.jira.model.Version;
 import org.vividus.zephyr.configuration.ZephyrConfiguration;
 import org.vividus.zephyr.configuration.ZephyrExporterConfiguration;
 import org.vividus.zephyr.configuration.ZephyrExporterProperties;
+import org.vividus.zephyr.databind.TestStepsSerializer;
+import org.vividus.zephyr.model.CucumberTestStep;
 import org.vividus.zephyr.model.TestCaseStatus;
+import org.vividus.zephyr.model.ZephyrTestCase;
 
 @ExtendWith(MockitoExtension.class)
 class ZephyrFacadeTests
@@ -66,18 +81,27 @@ class ZephyrFacadeTests
     private static final String FOLDER_ID = "11114";
     private static final String ISSUE_ID = "111";
     private static final String TEST = "test";
+    private static final String BODY = "{}";
+    private static final String CREATE_RESPONSE = "{\"key\" : \"" + ISSUE_ID + "\"}";
+    private static final String REQUIREMENT_ID = "requirement id";
+    private static final String TESTS = "Tests";
+    private static final String CREATE_LINK_FROM_TO = "Create '{}' link from {} to {}";
 
     @Mock private JiraFacade jiraFacade;
     @Mock private JiraClient client;
     @Mock private JiraClientProvider jiraClientProvider;
     @Mock private ZephyrExporterConfiguration zephyrExporterConfiguration;
+    @Mock private TestStepsSerializer testStepsSerializer;
+    @Mock private ZephyrExporterProperties zephyrExporterProperties;
     @InjectMocks private ZephyrFacade zephyrFacade;
+
+    private final TestLogger logger = TestLoggerFactory.getTestLogger(ZephyrFacade.class);
 
     @BeforeEach
     void init()
     {
-        zephyrFacade = new ZephyrFacade(jiraFacade, jiraClientProvider, zephyrExporterConfiguration,
-                new ZephyrExporterProperties());
+        zephyrFacade = new ZephyrFacade(jiraFacade, jiraClientProvider,
+                zephyrExporterConfiguration, zephyrExporterProperties, testStepsSerializer);
     }
 
     @Test
@@ -244,6 +268,19 @@ class ZephyrFacadeTests
         assertEquals(OptionalInt.empty(), zephyrFacade.findExecutionId(ISSUE_ID));
     }
 
+    @Test
+    void testCreateNewTestCase() throws IOException, JiraConfigurationException
+    {
+        ZephyrTestCase test = createZephyrTestCase();
+        mockSerialization(test);
+        when(jiraFacade.createIssue(BODY, Optional.empty())).thenReturn(CREATE_RESPONSE);
+        zephyrFacade.createTestCase(test);
+
+        assertThat(logger.getLoggingEvents(), is(List.of(
+                info("Creating Test Case: {}", BODY),
+                info("Test with key {} has been created", ISSUE_ID))));
+    }
+
     private void mockJiraProjectRetrieve() throws IOException, JiraConfigurationException
     {
         Version version = new Version();
@@ -265,5 +302,25 @@ class ZephyrFacadeTests
         Map<TestCaseStatus, String> statuses = new EnumMap<>(TestCaseStatus.class);
         statuses.put(TestCaseStatus.PASSED, TEST);
         when(zephyrExporterConfiguration.getStatuses()).thenReturn(statuses);
+    }
+
+    private ZephyrTestCase createZephyrTestCase()
+    {
+        ZephyrTestCase test = new ZephyrTestCase();
+        test.setLabels(new LinkedHashSet<>(List.of("label")));
+        test.setComponents(new LinkedHashSet<>(List.of("component")));
+        test.setTestSteps(List.of(new CucumberTestStep("testStep 1"), new CucumberTestStep("testStep 2")));
+        return test;
+    }
+
+    private void mockSerialization(ZephyrTestCase test) throws IOException
+    {
+        doAnswer(a ->
+        {
+            JsonGenerator generator = a.getArgument(1, JsonGenerator.class);
+            generator.writeStartObject();
+            generator.writeEndObject();
+            return null;
+        }).when(testStepsSerializer).serialize(eq(test), any(JsonGenerator.class), any(SerializerProvider.class));
     }
 }
