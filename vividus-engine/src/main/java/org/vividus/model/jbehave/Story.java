@@ -33,6 +33,8 @@ import org.apache.commons.lang3.StringUtils;
 
 public class Story
 {
+    private static final String TEST_CASE_ID = "testCaseId";
+
     private String path;
     private Lifecycle lifecycle;
     private List<Scenario> scenarios;
@@ -150,12 +152,17 @@ public class Story
      * @return the meta value
      * @throws NotUniqueMetaValueException if the <b>meta</b> has more than one value
      */
-    public Optional<String> getUniqueMetaValue(String metaName) throws NotUniqueMetaValueException
+    public Optional<String> getUniqueMetaValue(String metaName)
+        throws NotUniqueMetaValueException, InvalidScenarioTestCaseIdValue
     {
         Set<String> values = getMetaValues(metaName);
         if (values.size() > 1)
         {
             throw new NotUniqueMetaValueException(metaName, values);
+        }
+        if (metaName.equals(TEST_CASE_ID))
+        {
+            return getTestCaseIdMetaValue(values);
         }
         return values.isEmpty() ? Optional.empty() : Optional.of(values.iterator().next());
     }
@@ -190,5 +197,34 @@ public class Story
         return Optional.ofNullable(getMeta())
                 .map(List::stream)
                 .orElseGet(Stream::empty);
+    }
+
+    private Optional<String> getTestCaseIdMetaValue(Set<String> values) throws InvalidScenarioTestCaseIdValue
+    {
+        Set<String> scenariosTestCaseIds = getScenariosTestCaseIds();
+        if (values.isEmpty())
+        {
+            if (!scenariosTestCaseIds.isEmpty())
+            {
+                throw new InvalidScenarioTestCaseIdValue(scenariosTestCaseIds);
+            }
+            return Optional.empty();
+        }
+        String storyTestCaseId = values.iterator().next();
+        if (scenariosTestCaseIds.stream().anyMatch(id -> !id.equals(storyTestCaseId)))
+        {
+            throw new InvalidScenarioTestCaseIdValue(storyTestCaseId, scenariosTestCaseIds);
+        }
+        return Optional.of(storyTestCaseId);
+    }
+
+    private Set<String> getScenariosTestCaseIds()
+    {
+        Set<String> testCaseIds = new LinkedHashSet<>();
+        for (Scenario scenario : scenarios)
+        {
+            testCaseIds.addAll(scenario.getMetaValues(TEST_CASE_ID));
+        }
+        return testCaseIds;
     }
 }

@@ -36,6 +36,7 @@ import org.vividus.common.CommonExporterFacade;
 import org.vividus.jira.JiraConfigurationException;
 import org.vividus.jira.JiraFacade;
 import org.vividus.jira.model.JiraEntity;
+import org.vividus.model.jbehave.InvalidScenarioTestCaseIdValue;
 import org.vividus.model.jbehave.NotUniqueMetaValueException;
 import org.vividus.model.jbehave.Scenario;
 import org.vividus.model.jbehave.Story;
@@ -171,7 +172,7 @@ public class ZephyrExporter
             Optional<String> requirementId = story.getUniqueMetaValue(REQUIREMENT_ID);
             createTestsLink(testCaseId, requirementId);
         }
-        catch (IOException | NotUniqueMetaValueException | JiraConfigurationException e)
+        catch (IOException | NotUniqueMetaValueException | JiraConfigurationException | InvalidScenarioTestCaseIdValue e)
         {
             String errorMessage = STORY + story.getPath() + lineSeparator() + ERROR + e.getMessage();
             errors.add(errorMessage);
