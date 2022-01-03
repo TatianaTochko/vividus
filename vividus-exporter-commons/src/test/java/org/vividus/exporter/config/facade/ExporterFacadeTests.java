@@ -47,39 +47,21 @@ class ExporterFacadeTests
 
     private final TestLogger testLogger = TestLoggerFactory.getTestLogger(ExporterFacade.class);
 
-<<<<<<< HEAD
-=======
-    private final TestExporter facade = new TestExporter();
->>>>>>> 4e07c8a7 ([vividus-to-zephyr-exporter] Add ability import tests to zephyr)
     @Mock private JiraFacade jiraFacade;
 
     @Test
     void createLinkIfRequirementIdPresents() throws IOException, JiraConfigurationException
     {
-<<<<<<< HEAD
         ExporterFacade.createTestsLink(ISSUE_ID, Optional.of(REQUIREMENT_ID), jiraFacade);
-=======
-        facade.createTestsLink(ISSUE_ID, Optional.of(REQUIREMENT_ID), jiraFacade);
->>>>>>> 4e07c8a7 ([vividus-to-zephyr-exporter] Add ability import tests to zephyr)
         assertThat(testLogger.getLoggingEvents(), is(Collections.singletonList(
-                info("Create '{}' link from {} to {}", LINK_NAME, ISSUE_ID, REQUIREMENT_ID))));
+            info("Create '{}' link from {} to {}", LINK_NAME, ISSUE_ID, REQUIREMENT_ID))));
         verify(jiraFacade).createIssueLink(ISSUE_ID, REQUIREMENT_ID, LINK_NAME);
     }
 
     @Test
     void createLinkIfRequirementIdAbsent() throws IOException, JiraConfigurationException
     {
-<<<<<<< HEAD
         ExporterFacade.createTestsLink(ISSUE_ID, Optional.empty(), jiraFacade);
         verifyNoMoreInteractions(jiraFacade);
     }
-=======
-        facade.createTestsLink(ISSUE_ID, Optional.empty(), jiraFacade);
-        verifyNoMoreInteractions(jiraFacade);
-    }
-
-    private static final class TestExporter extends ExporterFacade
-    {
-    }
->>>>>>> 4e07c8a7 ([vividus-to-zephyr-exporter] Add ability import tests to zephyr)
 }

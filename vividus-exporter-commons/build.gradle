@@ -2,13 +2,9 @@ project.description = 'Common module for all VIVIDUS exporters'
 
 apply from: "logging.gradle"
 
-<<<<<<< HEAD
 ext {
     springBootVersion = '2.6.3'
 }
-
-=======
->>>>>>> 4e07c8a7 ([vividus-to-zephyr-exporter] Add ability import tests to zephyr)
 dependencies {
     implementation project(':vividus-facade-jira')
     implementation project(':vividus-util')
