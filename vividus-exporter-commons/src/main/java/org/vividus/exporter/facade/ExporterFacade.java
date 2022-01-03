@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import org.vividus.jira.JiraConfigurationException;
 import org.vividus.jira.JiraFacade;
 
-<<<<<<< HEAD
 public final class ExporterFacade
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExporterFacade.class);
@@ -34,14 +33,7 @@ public final class ExporterFacade
     }
 
     public static void createTestsLink(String testCaseId, Optional<String> requirementId, JiraFacade jiraFacade)
-=======
-public abstract class ExporterFacade
-{
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExporterFacade.class);
-
-    public void createTestsLink(String testCaseId, Optional<String> requirementId, JiraFacade jiraFacade)
->>>>>>> 4e07c8a7 ([vividus-to-zephyr-exporter] Add ability import tests to zephyr)
-            throws IOException, JiraConfigurationException
+        throws IOException, JiraConfigurationException
     {
         if (requirementId.isPresent())
         {
