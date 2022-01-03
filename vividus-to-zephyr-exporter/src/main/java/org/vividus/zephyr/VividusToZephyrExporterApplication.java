@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,24 +17,30 @@
 package org.vividus.zephyr;
 
 import java.io.IOException;
-import java.util.Properties;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportResource;
+import org.springframework.context.annotation.PropertySource;
+import org.vividus.exporter.config.VividusExporterCommonConfiguration;
 import org.vividus.jira.JiraConfigurationException;
-import org.vividus.util.property.PropertyParser;
 import org.vividus.zephyr.configuration.ZephyrExporterConfiguration;
 import org.vividus.zephyr.configuration.ZephyrExporterProperties;
 import org.vividus.zephyr.exporter.ZephyrExporter;
 
 @SpringBootApplication
+@Import(VividusExporterCommonConfiguration.class)
 @ImportResource(locations = { "org/vividus/zephyr/spring.xml", "org/vividus/http/client/spring.xml",
-        "org/vividus/jira/spring.xml" })
+        "org/vividus/jira/spring.xml",  "org/vividus/util/spring.xml" })
 @EnableConfigurationProperties({ ZephyrExporterConfiguration.class, ZephyrExporterProperties.class })
+@PropertySource({
+        "org/vividus/http/client/defaults.properties",
+        "org/vividus/util/defaults.properties"
+})
+@SuppressWarnings("checkstyle:hideutilityclassconstructor")
 public class VividusToZephyrExporterApplication
 {
     public static void main(String[] args) throws IOException, JiraConfigurationException
@@ -42,11 +48,5 @@ public class VividusToZephyrExporterApplication
         ApplicationContext ctx = SpringApplication.run(VividusToZephyrExporterApplication.class, args);
         ZephyrExporter exporter = ctx.getBean(ZephyrExporter.class);
         exporter.exportResults();
-    }
-
-    @Bean("propertyParser")
-    public PropertyParser propertyParser(Properties properties)
-    {
-        return new PropertyParser(properties);
     }
 }
