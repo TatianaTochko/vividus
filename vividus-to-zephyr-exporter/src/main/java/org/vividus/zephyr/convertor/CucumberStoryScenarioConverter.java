@@ -16,28 +16,63 @@
 
 package org.vividus.zephyr.convertor;
 
-import java.util.ArrayList;
-import java.util.List;
+import static java.lang.System.lineSeparator;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.vividus.model.jbehave.Parameters;
+import org.vividus.model.jbehave.Scenario;
 import org.vividus.model.jbehave.Step;
 import org.vividus.model.jbehave.Story;
 import org.vividus.zephyr.model.CucumberTestStep;
 
 public final class CucumberStoryScenarioConverter
 {
+    private static final String CUCUMBER_SEPARATOR = "|";
+    private static final String CUCUMBER_EXAMPLES = "Examples:";
+
     private CucumberStoryScenarioConverter()
     {
     }
 
-    public static List<CucumberTestStep> convert(String scenarioTitle, List<Step> steps)
+    public static List<CucumberTestStep> convertScenario(Scenario scenario)
     {
-        List<CucumberTestStep> testSteps = new ArrayList<>();
-        return testSteps;
+        List<CucumberTestStep> cucumberSteps = scenario.collectSteps()
+                .stream()
+                .map(Step::getValue)
+                .map(CucumberTestStep::new)
+                .collect(Collectors.toList());
+        if (scenario.getExamples() == null)
+        {
+            return cucumberSteps;
+        }
+        CucumberTestStep exampleStep = new CucumberTestStep(CUCUMBER_EXAMPLES);
+        exampleStep.setTestData(buildScenarioExamplesTable(scenario.getExamples().getParameters()));
+        cucumberSteps.add(exampleStep);
+        return cucumberSteps;
     }
 
-    public static List<CucumberTestStep> convert(Story steps)
+    public static List<CucumberTestStep> convertStory(Story story)
     {
-        List<CucumberTestStep> testSteps = new ArrayList<>();
-        return testSteps;
+        return story.getScenarios()
+                .stream()
+                .map(Scenario::getTitle)
+                .map(CucumberTestStep::new)
+                .collect(Collectors.toList());
+    }
+
+    private static String buildScenarioExamplesTable(Parameters parameters)
+    {
+        return joinTableRow(parameters.getNames())
+                + parameters.getValues().stream()
+                .map(CucumberStoryScenarioConverter::joinTableRow)
+                .collect(Collectors.joining());
+    }
+
+    private static String joinTableRow(List<String> values)
+    {
+        return values.stream().collect(
+                Collectors.joining(CUCUMBER_SEPARATOR, CUCUMBER_SEPARATOR, CUCUMBER_SEPARATOR + lineSeparator()));
     }
 }

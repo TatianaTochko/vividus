@@ -17,44 +17,11 @@
 package org.vividus.zephyr.model;
 
 import java.util.List;
-import java.util.Set;
 
-public class ZephyrTestCase
+public class ZephyrTestCase extends AbstractTestCaseParameters
 {
-    private String projectKey;
-    private Set<String> labels;
-    private Set<String> components;
     private List<CucumberTestStep> testSteps;
-
-    public String getProjectKey()
-    {
-        return projectKey;
-    }
-
-    public void setProjectKey(String projectKey)
-    {
-        this.projectKey = projectKey;
-    }
-
-    public Set<String> getLabels()
-    {
-        return labels;
-    }
-
-    public void setLabels(Set<String> labels)
-    {
-        this.labels = labels;
-    }
-
-    public Set<String> getComponents()
-    {
-        return components;
-    }
-
-    public void setComponents(Set<String> components)
-    {
-        this.components = components;
-    }
+    private TestLevel testLevel;
 
     public List<CucumberTestStep> getTestSteps()
     {
@@ -64,5 +31,15 @@ public class ZephyrTestCase
     public void setTestSteps(List<CucumberTestStep> testSteps)
     {
         this.testSteps = testSteps;
+    }
+
+    public TestLevel getTestLevel()
+    {
+        return testLevel;
+    }
+
+    public void setTestLevel(TestLevel testLevel)
+    {
+        this.testLevel = testLevel;
     }
 }

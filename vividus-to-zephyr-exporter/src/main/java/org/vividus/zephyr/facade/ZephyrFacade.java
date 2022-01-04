@@ -61,8 +61,8 @@ public class ZephyrFacade implements IZephyrFacade
     private final ObjectMapper objectMapper;
 
     public ZephyrFacade(JiraFacade jiraFacade, JiraClientProvider jiraClientProvider,
-          ZephyrExporterConfiguration zephyrExporterConfiguration,
-          ZephyrExporterProperties zephyrExporterProperties, TestStepsSerializer testStepsSerializer)
+                        ZephyrExporterConfiguration zephyrExporterConfiguration,
+                        ZephyrExporterProperties zephyrExporterProperties, TestStepsSerializer testStepsSerializer)
     {
         this.jiraFacade = jiraFacade;
         this.jiraClientProvider = jiraClientProvider;
@@ -93,7 +93,8 @@ public class ZephyrFacade implements IZephyrFacade
     {
         zephyrTest.setProjectKey(zephyrExporterConfiguration.getProjectKey());
         String createTestRequest = objectMapper.writeValueAsString(zephyrTest);
-        LOGGER.atInfo().addArgument(createTestRequest).log("Creating Test Case: {}");
+        LOGGER.atInfo().addArgument(zephyrTest::getTestLevel)
+                .addArgument(createTestRequest).log("Creating {} Test Case: {}");
         String response = jiraFacade
                 .createIssue(createTestRequest, Optional.ofNullable(zephyrExporterProperties.getJiraInstanceKey()));
         String issueKey = JsonPathUtils.getData(response, "$.key");
@@ -187,8 +188,8 @@ public class ZephyrFacade implements IZephyrFacade
         if (StringUtils.isNotBlank(zephyrExporterConfiguration.getFolderName()))
         {
             jsonpath = String.format("$..[?(@.versionName=='%s' && @.cycleName=='%s' && @.folderName=='%s')].id",
-                zephyrExporterConfiguration.getVersionName(), zephyrExporterConfiguration.getCycleName(),
-                zephyrExporterConfiguration.getFolderName());
+                    zephyrExporterConfiguration.getVersionName(), zephyrExporterConfiguration.getCycleName(),
+                    zephyrExporterConfiguration.getFolderName());
         }
         else
         {
@@ -203,7 +204,8 @@ public class ZephyrFacade implements IZephyrFacade
     {
         String json = getJiraClient().executeGet(ZAPI_ENDPOINT + "util/testExecutionStatus");
         Map<TestCaseStatus, Integer> testStatusPerZephyrIdMapping = new EnumMap<>(TestCaseStatus.class);
-        zephyrExporterConfiguration.getStatuses().forEach((key, value) -> {
+        zephyrExporterConfiguration.getStatuses().forEach((key, value) ->
+        {
             List<Integer> statusId = JsonPathUtils.getData(json, String.format("$.[?(@.name=='%s')].id", value));
             notEmpty(statusId, "Status '%s' does not exist", value);
             testStatusPerZephyrIdMapping.put(key, statusId.get(0));

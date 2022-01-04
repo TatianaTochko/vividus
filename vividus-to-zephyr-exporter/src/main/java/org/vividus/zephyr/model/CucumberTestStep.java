@@ -19,6 +19,7 @@ package org.vividus.zephyr.model;
 public class CucumberTestStep
 {
     private String testStep;
+    private String testData;
 
     public CucumberTestStep(String testStep)
     {
@@ -33,5 +34,15 @@ public class CucumberTestStep
     public void setTestStep(String testStep)
     {
         this.testStep = testStep;
+    }
+
+    public String getTestData()
+    {
+        return testData;
+    }
+
+    public void setTestData(String testData)
+    {
+        this.testData = testData;
     }
 }

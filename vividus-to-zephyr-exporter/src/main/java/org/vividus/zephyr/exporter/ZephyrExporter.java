@@ -74,7 +74,7 @@ public class ZephyrExporter
     private final ObjectMapper objectMapper;
 
     public ZephyrExporter(JiraFacade jiraFacade, CommonExporterFacade commonExporterFacade, ZephyrFacade zephyrFacade,
-            TestCaseParser testCaseParser, ZephyrExporterProperties zephyrExporterProperties)
+                          TestCaseParser testCaseParser, ZephyrExporterProperties zephyrExporterProperties)
     {
         this.jiraFacade = jiraFacade;
         this.commonExporterFacade = commonExporterFacade;
@@ -140,7 +140,8 @@ public class ZephyrExporter
         if (executionId.isPresent())
         {
             String executionBody = objectMapper.writeValueAsString(new ExecutionStatus(
-                String.valueOf(configuration.getTestStatusPerZephyrIdMapping().get(execution.getTestCaseStatus()))));
+                    String.valueOf(configuration.getTestStatusPerZephyrIdMapping()
+                            .get(execution.getTestCaseStatus()))));
             zephyrFacade.updateExecutionStatus(executionId.getAsInt(), executionBody);
         }
         else
@@ -157,8 +158,9 @@ public class ZephyrExporter
             String testCaseId = story.getUniqueMetaValue(TEST_CASE_ID).orElse(null);
             ZephyrTestCase zephyrTest = new ZephyrTestCase();
             TestCaseParameters parameters = createTestCaseStoryParameters(story);
-            parameters.setCucumberTestSteps(CucumberStoryScenarioConverter.convert(story));
+            parameters.setCucumberTestSteps(CucumberStoryScenarioConverter.convertStory(story));
             fillTestCase(parameters, zephyrTest);
+            zephyrTest.setTestLevel(TestLevel.STORY);
 
             if (testCaseId != null)
             {
@@ -190,9 +192,9 @@ public class ZephyrExporter
 
             ZephyrTestCase zephyrTest = new ZephyrTestCase();
             TestCaseParameters parameters = createTestCaseScenarioParameters(scenario);
-            parameters.setCucumberTestSteps(CucumberStoryScenarioConverter
-                    .convert(scenario.getTitle(), scenario.collectSteps()));
+            parameters.setCucumberTestSteps(CucumberStoryScenarioConverter.convertScenario(scenario));
             fillTestCase(parameters, zephyrTest);
+            zephyrTest.setTestLevel(TestLevel.SCENARIO);
 
             if (testCaseId != null)
             {
@@ -234,7 +236,7 @@ public class ZephyrExporter
     {
         zephyrTest.setLabels(parameters.getLabels());
         zephyrTest.setComponents(parameters.getComponents());
-        parameters.setCucumberTestSteps(parameters.getCucumberTestSteps());
+        zephyrTest.setTestSteps(parameters.getCucumberTestSteps());
     }
 
     private void createTestsLink(String testCaseId, Optional<String> requirementId)
