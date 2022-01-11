@@ -65,6 +65,7 @@ import org.vividus.zephyr.parser.TestCaseParser;
 class ZephyrExporterTests
 {
     public static final String CREATEREPORTS = "createreports";
+    public static final String UPDATEREPORTS = "updatereports";
     private static final String TEST_CASE_KEY1 = "TEST-1";
     private static final String TEST_CASE_KEY2 = "TEST-2";
     private static final String ISSUE_ID1 = "1";
@@ -149,8 +150,10 @@ class ZephyrExporterTests
         URI jsonResultsUri = getJsonResultsUri(CREATEREPORTS);
         zephyrExporterProperties.setLevel(TestLevel.STORY);
         zephyrExporterProperties.setSourceDirectory(Paths.get(jsonResultsUri));
+
         zephyrExporter.exportResults();
 
+        verify(zephyrFacade).createTestCase(any());
         assertThat(logger.getLoggingEvents(), is(Collections.singletonList(info("Exporting {} story", STORY_TITLE))));
     }
 
@@ -163,8 +166,38 @@ class ZephyrExporterTests
 
         zephyrExporter.exportResults();
 
+        verify(zephyrFacade).createTestCase(any());
         assertThat(logger.getLoggingEvents(), is(List.of(info(EXPORTING_SCENARIO_FROM_STORY, STORY_TITLE),
                 info(EXPORTING_SCENARIO, SCENARIO_TITLE))));
+    }
+
+    @Test
+    void shouldUpdateTestWithStoryLevel() throws URISyntaxException, IOException, JiraConfigurationException
+    {
+        URI jsonResultsUri = getJsonResultsUri(UPDATEREPORTS);
+        zephyrExporterProperties.setLevel(TestLevel.STORY);
+        zephyrExporterProperties.setSourceDirectory(Paths.get(jsonResultsUri));
+        zephyrExporterProperties.setUpdateCasesOnExport(true);
+
+        zephyrExporter.exportResults();
+
+        verify(zephyrFacade).updateTestCase(any(),any());
+        assertThat(logger.getLoggingEvents(), is(List.of(info("Exporting {} story", STORY_TITLE))));
+    }
+
+    @Test
+    void shouldUpdateTestWithScenarioLevel() throws URISyntaxException, IOException, JiraConfigurationException
+    {
+        URI jsonResultsUri = getJsonResultsUri(UPDATEREPORTS);
+        zephyrExporterProperties.setLevel(TestLevel.SCENARIO);
+        zephyrExporterProperties.setSourceDirectory(Paths.get(jsonResultsUri));
+        zephyrExporterProperties.setUpdateCasesOnExport(true);
+
+        zephyrExporter.exportResults();
+
+        verify(zephyrFacade).updateTestCase(any(),any());
+        assertThat(logger.getLoggingEvents(), is(List.of(info(EXPORTING_SCENARIO_FROM_STORY, STORY_TITLE),
+            info(EXPORTING_SCENARIO, SCENARIO_TITLE))));
     }
 
     private ZephyrConfiguration prepareTestConfiguration()

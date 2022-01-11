@@ -39,6 +39,10 @@ public class ZephyrExporterProperties
 
     private TestLevel level;
 
+    private boolean updateCasesOnExport;
+
+    private String statusForUpdatedTestCases = "Backlog";
+
     public String getJiraInstanceKey()
     {
         return jiraInstanceKey;
@@ -87,5 +91,25 @@ public class ZephyrExporterProperties
     public void setLevel(TestLevel level)
     {
         this.level = level;
+    }
+
+    public boolean isUpdateCasesOnExport()
+    {
+        return updateCasesOnExport;
+    }
+
+    public void setUpdateCasesOnExport(boolean updateCasesOnExport)
+    {
+        this.updateCasesOnExport = updateCasesOnExport;
+    }
+
+    public String getStatusForUpdatedTestCases()
+    {
+        return statusForUpdatedTestCases;
+    }
+
+    public void setStatusForUpdatedTestCases(String statusForUpdatedTestCases)
+    {
+        this.statusForUpdatedTestCases = statusForUpdatedTestCases;
     }
 }

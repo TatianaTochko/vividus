@@ -84,8 +84,16 @@ public class ZephyrFacade implements IZephyrFacade
 
     @Override
     public void updateTestCase(String testCaseId, ZephyrTestCase zephyrTest)
+        throws IOException, JiraConfigurationException
     {
-        LOGGER.atInfo().addArgument(testCaseId).log("Updating Test Case: {}");
+        String updateTestRequest = objectMapper.writeValueAsString(zephyrTest);
+        LOGGER.atInfo().addArgument(testCaseId)
+              .addArgument(updateTestRequest)
+              .log("Updating Test Case with ID {}: {}");
+        jiraFacade.updateIssue(testCaseId, updateTestRequest);
+        jiraFacade.setIssueStatus(testCaseId, zephyrExporterProperties.getStatusForUpdatedTestCases());
+        LOGGER.atInfo().addArgument(testCaseId)
+              .log("Test with key {} has been updated");
     }
 
     @Override

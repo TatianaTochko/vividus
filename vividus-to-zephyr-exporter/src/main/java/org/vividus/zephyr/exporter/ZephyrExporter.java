@@ -160,7 +160,7 @@ public class ZephyrExporter
             parameters.setCucumberTestSteps(CucumberStoryScenarioConverter.convert(story));
             fillTestCase(parameters, zephyrTest);
 
-            if (testCaseId != null)
+            if (testCaseId != null && zephyrExporterProperties.isUpdateCasesOnExport())
             {
                 zephyrFacade.updateTestCase(testCaseId, zephyrTest);
             }
@@ -194,7 +194,7 @@ public class ZephyrExporter
                     .convert(scenario.getTitle(), scenario.collectSteps()));
             fillTestCase(parameters, zephyrTest);
 
-            if (testCaseId != null)
+            if (testCaseId != null && zephyrExporterProperties.isUpdateCasesOnExport())
             {
                 zephyrFacade.updateTestCase(testCaseId, zephyrTest);
             }

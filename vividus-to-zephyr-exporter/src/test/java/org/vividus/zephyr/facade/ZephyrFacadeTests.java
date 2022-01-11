@@ -281,6 +281,20 @@ class ZephyrFacadeTests
                 info("Test with key {} has been created", ISSUE_ID))));
     }
 
+    @Test
+    void testUpdateTestCase() throws IOException, JiraConfigurationException
+    {
+        ZephyrTestCase test = createZephyrTestCase();
+        mockSerialization(test);
+        when(jiraFacade.updateIssue(ISSUE_ID, BODY)).thenReturn(BODY);
+
+        zephyrFacade.updateTestCase(ISSUE_ID, test);
+
+        assertThat(logger.getLoggingEvents(), is(List.of(
+            info("Updating Test Case with ID {}: {}", ISSUE_ID, BODY),
+            info("Test with key {} has been updated", ISSUE_ID))));
+    }
+
     private void mockJiraProjectRetrieve() throws IOException, JiraConfigurationException
     {
         Version version = new Version();

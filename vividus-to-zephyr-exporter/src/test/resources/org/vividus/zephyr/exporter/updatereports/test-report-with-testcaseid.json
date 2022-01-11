@@ -4,6 +4,13 @@
   "lifecycle": {
     "keyword": "Lifecycle:"
   },
+  "meta": [
+    {
+      "keyword": "@",
+      "name": "testCaseId",
+      "value": "STUB-1"
+    }
+  ],
   "beforeStorySteps": [],
   "scenarios": [
     {

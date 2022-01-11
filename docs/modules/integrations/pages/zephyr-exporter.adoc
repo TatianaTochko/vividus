@@ -4,6 +4,8 @@ Zephyr Exporter is a tool used for exporting test execution results into Jira Ze
 
 Features:
 
+* Create test cases
+* Update test cases
 * Create test executions
 * Set test execution statuses
 
@@ -33,6 +35,14 @@ include::partial$jira-configuration.adoc[]
 |`zephyr.exporter.update-execution-statuses-only`
 |false
 |Property for update existing executions statuses only.
+
+|`zephyr.exporter.update-cases-on-export`
+|false
+|Property to update existing test cases. User with update status permissions required in order to work.
+
+|`zephyr.exporter.status-for-updated-test-cases`
+|false
+|Property defines status which will be set for all updated tests ("Backlog" by default).
 
 |`zephyr.exporter.statuses-of-test-cases-to-add-to-execution`
 |false

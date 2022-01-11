@@ -38,7 +38,10 @@ public class JiraFacade
 
     private static final String REST_API_ENDPOINT = "/rest/api/latest/";
     private static final String ISSUE = "issue/";
+    private static final String TRANSITIONS = ISSUE + "%s/transitions/";
     private static final String ISSUE_ENDPOINT = REST_API_ENDPOINT + ISSUE;
+    private static final String TRANSITIONS_ENDPOINT = REST_API_ENDPOINT + TRANSITIONS;
+    private static final String UPDATE_TRANSITION_BODY = "{'transition':{'id':%s}}";
 
     private final JiraClientProvider jiraClientProvider;
 
@@ -70,6 +73,20 @@ public class JiraFacade
     {
         String issue = jiraClientProvider.getByIssueKey(issueKey).executeGet(ISSUE_ENDPOINT + issueKey);
         return JsonPathUtils.getData(issue, "$.fields.status.name");
+    }
+
+    public String setIssueStatus(String issueKey, String status) throws JiraConfigurationException, IOException
+    {
+        String statusId = getStatusIdByName(issueKey, status);
+        return jiraClientProvider.getByIssueKey(issueKey).executePost(String.format(TRANSITIONS_ENDPOINT, issueKey),
+            String.format(UPDATE_TRANSITION_BODY, statusId));
+    }
+
+    private String getStatusIdByName(String issueKey, String name) throws JiraConfigurationException, IOException
+    {
+        String statuses = jiraClientProvider.getByIssueKey(issueKey)
+                                            .executeGet(String.format(TRANSITIONS_ENDPOINT, issueKey));
+        return JsonPathUtils.getData(statuses, String.format("$.transitions[?(@.to.name=='%s')].id", name));
     }
 
     public Project getProject(String projectKey) throws IOException, JiraConfigurationException
