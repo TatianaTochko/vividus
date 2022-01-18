@@ -18,6 +18,7 @@ package org.vividus.jira;
 
 import static java.util.Optional.empty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -39,6 +40,8 @@ class JiraFacadeTests
     private static final String ISSUE_ID = "issue id";
     private static final String ISSUE_BODY = "issue body";
     private static final String ISSUE_ENDPOINT = "/rest/api/latest/issue/";
+    private static final String TRANSITIONS_ENDPOINT = ISSUE_ENDPOINT + "%s/transitions/";
+    private static final String BACKLOG = "Backlog";
 
     @Mock private JiraClient jiraClient;
     @Mock private JiraClientProvider jiraClientProvider;
@@ -80,7 +83,7 @@ class JiraFacadeTests
     }
 
     @Test
-    void shouldReturnIssueStatue() throws IOException, JiraConfigurationException
+    void shouldReturnIssueStatus() throws IOException, JiraConfigurationException
     {
         when(jiraClientProvider.getByIssueKey(ISSUE_ID)).thenReturn(jiraClient);
         when(jiraClient.executeGet(ISSUE_ENDPOINT + ISSUE_ID))
@@ -112,5 +115,34 @@ class JiraFacadeTests
         assertEquals("Release 1.0", project.getVersions().get(0).getName());
         assertEquals("0022", project.getVersions().get(1).getId());
         assertEquals("Release 2.0", project.getVersions().get(1).getName());
+    }
+
+    @Test
+    void shouldSetIssueStatus() throws JiraConfigurationException, IOException
+    {
+        String transitionsEndpoint = String.format(TRANSITIONS_ENDPOINT, ISSUE_ID);
+        when(jiraClientProvider.getByIssueKey(ISSUE_ID)).thenReturn(jiraClient);
+        when(jiraClient.executePost(eq(transitionsEndpoint), eq("{'transition':{'id':'1'}}"))).thenReturn(ISSUE_ID);
+        when(jiraClient.executeGet(eq(transitionsEndpoint)))
+            .thenReturn("{\"expand\": \"transitions\",\"transitions\": [{\"id\": \"1"
+                + "\",\"name\": \"Move to Backlog\",\"to\":{\"name\": \"Backlog\",\"id\":\"10000\"}}]}");
+
+        String issueId = jiraFacade.setIssueStatus(ISSUE_ID, BACKLOG);
+        assertEquals(ISSUE_ID, issueId);
+    }
+
+    @Test
+    void shouldGetTransitionId() throws IOException, JiraConfigurationException
+    {
+        String expectedTransitionId = "11";
+        when(jiraClientProvider.getByIssueKey(ISSUE_ID)).thenReturn(jiraClient);
+        when(jiraClient.executeGet(String.format(TRANSITIONS_ENDPOINT, ISSUE_ID)))
+            .thenReturn("{\"expand\": \"transitions\",\"transitions\": [{\"id\": \"" + expectedTransitionId
+                + "\",\"name\": \"To Do\",\"to\":{\"self\": \"https://jira.atlassian.net/rest/api/2/status/10000\","
+                + "\"name\": \"Backlog\",\"id\":\"10000\"}},{\"id\": \"12\",\"name\": \"To Do\",\"to\": {\"self\": "
+                + "\"https://jira.atlassian.net/rest/api/2/status/10001\",\"name\": \"Open\",\"id\": \"10001\"}}]}");
+
+        String transitionId = jiraFacade.getTransitionIdByName(ISSUE_ID, BACKLOG);
+        assertEquals(expectedTransitionId, transitionId);
     }
 }

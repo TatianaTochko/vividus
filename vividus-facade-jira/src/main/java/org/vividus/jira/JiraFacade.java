@@ -16,7 +16,10 @@
 
 package org.vividus.jira;
 
+import static org.apache.commons.lang3.Validate.notEmpty;
+
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -41,7 +44,7 @@ public class JiraFacade
     private static final String TRANSITIONS = ISSUE + "%s/transitions/";
     private static final String ISSUE_ENDPOINT = REST_API_ENDPOINT + ISSUE;
     private static final String TRANSITIONS_ENDPOINT = REST_API_ENDPOINT + TRANSITIONS;
-    private static final String UPDATE_TRANSITION_BODY = "{'transition':{'id':%s}}";
+    private static final String UPDATE_TRANSITION_BODY = "{'transition':{'id':'%s'}}";
 
     private final JiraClientProvider jiraClientProvider;
 
@@ -77,16 +80,19 @@ public class JiraFacade
 
     public String setIssueStatus(String issueKey, String status) throws JiraConfigurationException, IOException
     {
-        String statusId = getStatusIdByName(issueKey, status);
+        String transitionId = getTransitionIdByName(issueKey, status);
         return jiraClientProvider.getByIssueKey(issueKey).executePost(String.format(TRANSITIONS_ENDPOINT, issueKey),
-            String.format(UPDATE_TRANSITION_BODY, statusId));
+            String.format(UPDATE_TRANSITION_BODY, transitionId));
     }
 
-    private String getStatusIdByName(String issueKey, String name) throws JiraConfigurationException, IOException
+    public String getTransitionIdByName(String issueKey, String status) throws JiraConfigurationException, IOException
     {
         String statuses = jiraClientProvider.getByIssueKey(issueKey)
                                             .executeGet(String.format(TRANSITIONS_ENDPOINT, issueKey));
-        return JsonPathUtils.getData(statuses, String.format("$.transitions[?(@.to.name=='%s')].id", name));
+        List<String> transitionIds = JsonPathUtils.getData(statuses,
+            String.format("$.transitions[?(@.to.name=='%s')].id", status));
+        notEmpty(transitionIds, "Issue status cannot be set to '%s'. No such transition Id's found.", status);
+        return transitionIds.get(0);
     }
 
     public Project getProject(String projectKey) throws IOException, JiraConfigurationException
