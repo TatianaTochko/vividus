@@ -16,12 +16,18 @@
 
 package org.vividus.xray.databind;
 
+<<<<<<< HEAD
 import static org.apache.commons.lang3.Validate.isTrue;
+=======
+>>>>>>> 4e07c8a7 ([vividus-to-zephyr-exporter] Add ability import tests to zephyr)
 import static org.vividus.exporter.databind.SerializeJsonHelper.writeJsonArray;
 import static org.vividus.exporter.databind.SerializeJsonHelper.writeObjectWithField;
 
 import java.io.IOException;
+<<<<<<< HEAD
 import java.util.Map;
+=======
+>>>>>>> 4e07c8a7 ([vividus-to-zephyr-exporter] Add ability import tests to zephyr)
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -86,10 +92,16 @@ public abstract class AbstractTestCaseSerializer<T extends AbstractTestCase> ext
         writeObjectWithField(generator, objectKey, "value", fieldValue);
     }
 
+<<<<<<< HEAD
     protected abstract void serializeCustomFields(T testCase, Map<String, String> mapping, JsonGenerator generator)
             throws IOException;
 
     protected String getSafely(String key, Map<String, String> mapping)
+=======
+    protected abstract void serializeCustomFields(T testCase, JsonGenerator generator) throws IOException;
+
+    protected JiraFieldsMapping getJiraFieldsMapping()
+>>>>>>> 4e07c8a7 ([vividus-to-zephyr-exporter] Add ability import tests to zephyr)
     {
         String value = mapping.get(key);
         isTrue(value != null, "The mapping for the '%s' field must be configured", key);
