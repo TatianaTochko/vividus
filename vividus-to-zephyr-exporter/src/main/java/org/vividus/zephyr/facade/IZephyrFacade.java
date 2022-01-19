@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,17 @@ import java.util.OptionalInt;
 
 import org.vividus.jira.JiraConfigurationException;
 import org.vividus.zephyr.configuration.ZephyrConfiguration;
+import org.vividus.zephyr.model.ZephyrTestCase;
 
 public interface IZephyrFacade
 {
     ZephyrConfiguration prepareConfiguration() throws IOException, JiraConfigurationException;
 
     Integer createExecution(String execution) throws IOException, JiraConfigurationException;
+
+    void updateTestCase(String testCaseId, ZephyrTestCase zephyrTest) throws IOException, JiraConfigurationException;
+
+    String createTestCase(ZephyrTestCase zephyrTest) throws IOException, JiraConfigurationException;
 
     void updateExecutionStatus(int executionId, String executionBody) throws IOException, JiraConfigurationException;
 

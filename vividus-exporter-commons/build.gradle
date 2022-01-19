@@ -1,6 +1,9 @@
 project.description = 'Common module for all VIVIDUS exporters'
 
+apply from: "logging.gradle"
+
 dependencies {
+    implementation project(':vividus-facade-jira')
     implementation project(':vividus-util')
     implementation(group: 'org.springframework.boot', name: 'spring-boot-starter', version: versions.springBoot)
 

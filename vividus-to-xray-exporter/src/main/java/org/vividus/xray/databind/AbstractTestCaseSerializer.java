@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,10 @@
 
 package org.vividus.xray.databind;
 
+import static org.vividus.exporter.databind.SerializeJsonHelper.writeJsonArray;
+import static org.vividus.exporter.databind.SerializeJsonHelper.writeObjectWithField;
+
 import java.io.IOException;
-import java.util.Collection;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -70,37 +72,6 @@ public abstract class AbstractTestCaseSerializer<T extends AbstractTestCase> ext
     }
 
     protected abstract void serializeCustomFields(T testCase, JsonGenerator generator) throws IOException;
-
-    private static void writeJsonArray(JsonGenerator generator, String startField, Collection<String> values,
-            boolean wrapValuesAsObjects) throws IOException
-    {
-        if (values != null)
-        {
-            generator.writeArrayFieldStart(startField);
-            for (String value : values)
-            {
-                if (wrapValuesAsObjects)
-                {
-                    generator.writeStartObject();
-                    generator.writeStringField(NAME, value);
-                    generator.writeEndObject();
-                }
-                else
-                {
-                    generator.writeString(value);
-                }
-            }
-            generator.writeEndArray();
-        }
-    }
-
-    private static void writeObjectWithField(JsonGenerator generator, String objectKey, String fieldName,
-            String fieldValue) throws IOException
-    {
-        generator.writeObjectFieldStart(objectKey);
-        generator.writeStringField(fieldName, fieldValue);
-        generator.writeEndObject();
-    }
 
     protected JiraFieldsMapping getJiraFieldsMapping()
     {
