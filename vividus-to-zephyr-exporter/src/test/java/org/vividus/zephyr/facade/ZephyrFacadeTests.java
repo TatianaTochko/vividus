@@ -66,6 +66,7 @@ import org.vividus.zephyr.configuration.ZephyrConfiguration;
 import org.vividus.zephyr.configuration.ZephyrExporterConfiguration;
 import org.vividus.zephyr.configuration.ZephyrExporterProperties;
 import org.vividus.zephyr.databind.TestCaseSerializer;
+import org.vividus.zephyr.databind.TestStepsSerializer;
 import org.vividus.zephyr.model.CucumberTestStep;
 import org.vividus.zephyr.model.TestCaseStatus;
 import org.vividus.zephyr.model.ZephyrTestCase;
@@ -103,6 +104,7 @@ class ZephyrFacadeTests
     @Mock private JiraClientProvider jiraClientProvider;
     @Mock private ZephyrExporterConfiguration zephyrExporterConfiguration;
     @Mock private TestCaseSerializer testCaseSerializer;
+    @Mock private TestStepsSerializer testStepsSerializer;
     @Mock private ZephyrExporterProperties zephyrExporterProperties;
     @InjectMocks private ZephyrFacade zephyrFacade;
 

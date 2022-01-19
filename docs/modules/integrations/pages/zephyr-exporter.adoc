@@ -20,12 +20,17 @@ include::partial$jira-configuration.adoc[]
 |Required
 |Description
 
+<<<<<<< HEAD
 |`zephyr.exporter.export-results`
 |true
 |Property to export tests
 
 |`zephyr.exporter.level`
 |false
+=======
+|`zephyr.exporter.level`
+|true
+>>>>>>> 4e07c8a7 ([vividus-to-zephyr-exporter] Add ability import tests to zephyr)
 |Property to export stories on STORY or SCENARIO level
 
 |`zephyr.exporter.jira-instance-key`
@@ -76,16 +81,30 @@ The Zephyr is a Jira plugin that uses custom Jira fields for it's data, one of t
 
 === Test Case Properties
 
+<<<<<<< HEAD
 image::zephyr.png[]
+=======
+image::zephyr.png[Zephyr test case view]
+
+>>>>>>> 4e07c8a7 ([vividus-to-zephyr-exporter] Add ability import tests to zephyr)
 [cols="1,2", options="header"]
 |===
 
 |Property
 |Description
 
+<<<<<<< HEAD
 |`jira.<jira-instance-key>.fields-mapping.story-type`
 |Key of a field containing story type
 
+=======
+|`jira.fields-mapping.story-type`
+|Key of a field containing story type
+
+|`jira.fields-mapping.test-step`
+|Key of a field containing step of cucumber story/scenario
+
+>>>>>>> 4e07c8a7 ([vividus-to-zephyr-exporter] Add ability import tests to zephyr)
 |===
 
 include::partial$authentication.adoc[]

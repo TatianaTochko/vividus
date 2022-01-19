@@ -44,6 +44,7 @@ import org.vividus.model.jbehave.Story;
 import org.vividus.output.OutputReader;
 import org.vividus.zephyr.configuration.ZephyrConfiguration;
 import org.vividus.zephyr.configuration.ZephyrExporterProperties;
+import org.vividus.zephyr.convertor.CucumberStoryScenarioConverter;
 import org.vividus.zephyr.databind.TestCaseDeserializer;
 import org.vividus.zephyr.facade.IZephyrFacade;
 import org.vividus.zephyr.facade.TestCaseParameters;
