@@ -25,6 +25,7 @@ public class ZephyrTestCase
     private Set<String> labels;
     private Set<String> components;
     private List<CucumberTestStep> testSteps;
+    private TestCaseLevel testCaseLevel;
     private String summary;
 
     public String getProjectKey()
@@ -75,5 +76,15 @@ public class ZephyrTestCase
     public void setSummary(String summary)
     {
         this.summary = summary;
+    }
+
+    public TestCaseLevel getTestCaseLevel()
+    {
+        return testCaseLevel;
+    }
+
+    public void setTestCaseLevel(TestCaseLevel testCaseLevel)
+    {
+        this.testCaseLevel = testCaseLevel;
     }
 }

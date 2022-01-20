@@ -160,8 +160,9 @@ public class ZephyrExporter extends ExporterFacade
             String testCaseId = story.getUniqueMetaValue(TEST_CASE_ID).orElse(null);
             ZephyrTestCase zephyrTest = new ZephyrTestCase();
             TestCaseParameters parameters = createTestCaseStoryParameters(story);
-            parameters.setCucumberTestSteps(CucumberStoryScenarioConverter.convert(story));
+            parameters.setCucumberTestSteps(CucumberStoryScenarioConverter.convertStory(story));
             fillTestCase(parameters, zephyrTest);
+            zephyrTest.setTestCaseLevel(TestCaseLevel.STORY);
 
             if (testCaseId != null && zephyrExporterProperties.isUpdateCasesOnExport())
             {
@@ -194,9 +195,9 @@ public class ZephyrExporter extends ExporterFacade
 
             ZephyrTestCase zephyrTest = new ZephyrTestCase();
             TestCaseParameters parameters = createTestCaseScenarioParameters(scenario);
-            parameters.setCucumberTestSteps(CucumberStoryScenarioConverter
-                    .convert(scenario.getTitle(), scenario.collectSteps()));
+            parameters.setCucumberTestSteps(CucumberStoryScenarioConverter.convertScenario(scenario));
             fillTestCase(parameters, zephyrTest);
+            zephyrTest.setTestCaseLevel(TestCaseLevel.SCENARIO);
 
             if (testCaseId != null && zephyrExporterProperties.isUpdateCasesOnExport())
             {
@@ -247,6 +248,6 @@ public class ZephyrExporter extends ExporterFacade
         zephyrTest.setLabels(parameters.getLabels());
         zephyrTest.setComponents(parameters.getComponents());
         zephyrTest.setSummary(parameters.getSummary());
-        parameters.setCucumberTestSteps(parameters.getCucumberTestSteps());
+        zephyrTest.setTestSteps(parameters.getCucumberTestSteps());
     }
 }

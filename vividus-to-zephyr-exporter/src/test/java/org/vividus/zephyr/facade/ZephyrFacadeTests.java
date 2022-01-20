@@ -281,7 +281,7 @@ class ZephyrFacadeTests
         zephyrFacade.createTestCase(test);
 
         assertThat(logger.getLoggingEvents(), is(List.of(
-                info("Creating Test Case: {}", BODY),
+                info("Creating {} Test Case: {}", Optional.empty(), BODY),
                 info("Test with key {} has been created", ISSUE_ID))));
     }
 

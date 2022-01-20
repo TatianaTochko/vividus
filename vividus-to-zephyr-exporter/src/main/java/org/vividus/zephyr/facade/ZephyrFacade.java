@@ -101,7 +101,8 @@ public class ZephyrFacade implements IZephyrFacade
     {
         zephyrTest.setProjectKey(zephyrExporterConfiguration.getProjectKey());
         String createTestRequest = objectMapper.writeValueAsString(zephyrTest);
-        LOGGER.atInfo().addArgument(createTestRequest).log("Creating Test Case: {}");
+        LOGGER.atInfo().addArgument(zephyrTest::getTestCaseLevel)
+              .addArgument(createTestRequest).log("Creating {} Test Case: {}");
         String response = jiraFacade
                 .createIssue(createTestRequest, Optional.ofNullable(zephyrExporterProperties.getJiraInstanceKey()));
         String issueKey = JsonPathUtils.getData(response, "$.key");
