@@ -22,8 +22,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
@@ -37,14 +40,15 @@ import org.vividus.exporter.facade.ExporterFacade;
 import org.vividus.jira.JiraConfigurationException;
 import org.vividus.jira.JiraFacade;
 import org.vividus.jira.model.JiraEntity;
+import org.vividus.model.jbehave.AbstractStepsContainer;
 import org.vividus.model.jbehave.IContainingMeta;
 import org.vividus.model.jbehave.NotUniqueMetaValueException;
 import org.vividus.model.jbehave.Scenario;
+import org.vividus.model.jbehave.Step;
 import org.vividus.model.jbehave.Story;
 import org.vividus.output.OutputReader;
 import org.vividus.zephyr.configuration.ZephyrConfiguration;
 import org.vividus.zephyr.configuration.ZephyrExporterProperties;
-import org.vividus.zephyr.convertor.CucumberStoryScenarioConverter;
 import org.vividus.zephyr.databind.TestCaseDeserializer;
 import org.vividus.zephyr.facade.IZephyrFacade;
 import org.vividus.zephyr.facade.TestCaseParameters;
@@ -52,9 +56,9 @@ import org.vividus.zephyr.facade.ZephyrFacade;
 import org.vividus.zephyr.model.ExecutionStatus;
 import org.vividus.zephyr.model.TestCaseExecution;
 import org.vividus.zephyr.model.TestCaseLevel;
+import org.vividus.zephyr.model.TestCaseStatus;
 import org.vividus.zephyr.model.ZephyrExecution;
 import org.vividus.zephyr.model.ZephyrTestCase;
-import org.vividus.zephyr.parser.TestCaseParser;
 
 public class ZephyrExporter
 {
@@ -63,6 +67,7 @@ public class ZephyrExporter
     private static final Logger LOGGER = LoggerFactory.getLogger(ZephyrExporter.class);
     private static final String TEST_CASE_ID = "testCaseId";
     private static final String STORY = "Story: ";
+    private static final String SCENARIO = "Scenario: ";
     private static final String ERROR = "Error: ";
     private static final String REQUIREMENT_ID = "requirementId";
 
@@ -70,16 +75,14 @@ public class ZephyrExporter
 
     private final JiraFacade jiraFacade;
     private final IZephyrFacade zephyrFacade;
-    private final TestCaseParser testCaseParser;
     private final ZephyrExporterProperties zephyrExporterProperties;
     private final ObjectMapper objectMapper;
 
     public ZephyrExporter(JiraFacade jiraFacade, ZephyrFacade zephyrFacade,
-            TestCaseParser testCaseParser, ZephyrExporterProperties zephyrExporterProperties)
+                          ZephyrExporterProperties zephyrExporterProperties)
     {
         this.jiraFacade = jiraFacade;
         this.zephyrFacade = zephyrFacade;
-        this.testCaseParser = testCaseParser;
         this.zephyrExporterProperties = zephyrExporterProperties;
         this.objectMapper = JsonMapper.builder()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
@@ -96,12 +99,7 @@ public class ZephyrExporter
             for (Story story : OutputReader.readStoriesFromJsons(zephyrExporterProperties.getSourceDirectory()))
             {
                 TestCaseLevel testCaseLevel = zephyrExporterProperties.getLevel();
-                if (testCaseLevel.equals(TestCaseLevel.STORY))
-                {
-                    LOGGER.atInfo().addArgument(story::getPath).log("Exporting {} story");
-                    exportStory(story);
-                }
-                if (zephyrExporterProperties.getLevel().equals(TestCaseLevel.SCENARIO))
+                if (testCaseLevel.equals(TestCaseLevel.SCENARIO))
                 {
                     LOGGER.atInfo().addArgument(story::getPath).log("Exporting scenarios from {} story");
                     for (Scenario scenario : story.getFoldedScenarios())
@@ -109,24 +107,29 @@ public class ZephyrExporter
                         exportScenario(story.getPath(), scenario);
                     }
                 }
+                else if (testCaseLevel.equals(TestCaseLevel.STORY))
+                {
+                    LOGGER.atInfo().addArgument(story::getPath).log("Exporting {} story");
+                    exportStory(story);
+                }
             }
         }
-        exportTestExecutions();
-    }
-
-    private void exportTestExecutions() throws IOException, JiraConfigurationException
-    {
-        ZephyrConfiguration configuration = zephyrFacade.prepareConfiguration();
-        List<TestCaseExecution> testCasesForImportingExecution = testCaseParser.createTestCases(objectMapper);
-        for (TestCaseExecution testCaseExecution : testCasesForImportingExecution)
+        else
         {
-            exportTestExecution(testCaseExecution, configuration);
+            for (Story story : OutputReader.readStoriesFromJsons(zephyrExporterProperties.getSourceDirectory()))
+            {
+                for (Scenario scenario : story.getFoldedScenarios())
+                {
+                    exportOnlyTestExecution(scenario);
+                }
+            }
         }
     }
 
-    private void exportTestExecution(TestCaseExecution testCaseExecution, ZephyrConfiguration configuration)
-            throws IOException, JiraConfigurationException
+    void exportTestExecution(TestCaseExecution testCaseExecution)
+        throws IOException, JiraConfigurationException
     {
+        ZephyrConfiguration configuration = zephyrFacade.prepareConfiguration();
         JiraEntity issue = jiraFacade.getIssue(testCaseExecution.getKey());
         ZephyrExecution execution = new ZephyrExecution(configuration, issue.getId(), testCaseExecution.getStatus());
         OptionalInt executionId;
@@ -172,8 +175,8 @@ public class ZephyrExporter
                 zephyrFacade.createTestSteps(story, getIssueId(testCaseId));
             }
             Optional<String> requirementId = story.getUniqueMetaValue(REQUIREMENT_ID);
-
             ExporterFacade.createTestsLink(testCaseId, requirementId, jiraFacade);
+            exportTestExecution(new TestCaseExecution(testCaseId, createStoryExecutionStatus(story)));
         }
         catch (IOException | NotUniqueMetaValueException | JiraConfigurationException e)
         {
@@ -195,7 +198,6 @@ public class ZephyrExporter
             ZephyrTestCase zephyrTest = new ZephyrTestCase();
             TestCaseParameters parameters = createTestCaseScenarioParameters(scenario);
             fillTestCase(parameters, zephyrTest);
-
             if (testCaseId != null && zephyrExporterProperties.isUpdateCasesOnExport())
             {
                 zephyrFacade.updateTestCase(testCaseId, zephyrTest);
@@ -207,13 +209,33 @@ public class ZephyrExporter
             }
             Optional<String> requirementId = scenario.getUniqueMetaValue(REQUIREMENT_ID);
             ExporterFacade.createTestsLink(testCaseId, requirementId, jiraFacade);
+            exportTestExecution(new TestCaseExecution(testCaseId, createScenarioExecutionStatus(scenario)));
         }
         catch (IOException | NotUniqueMetaValueException | JiraConfigurationException e)
         {
-            String errorMessage = STORY + storyTitle + lineSeparator() + "Scenario: " + scenarioTitle
-                    + lineSeparator() + ERROR + e.getMessage();
+            String errorMessage = STORY + storyTitle + lineSeparator() + SCENARIO + scenarioTitle
+                + lineSeparator() + ERROR + e.getMessage();
             errors.add(errorMessage);
             LOGGER.atError().setCause(e).log("Got an error while exporting scenario");
+        }
+    }
+
+    private void exportOnlyTestExecution(Scenario scenario) throws IOException, JiraConfigurationException
+    {
+        try
+        {
+            String testCaseId = scenario.getUniqueMetaValue(TEST_CASE_ID).orElse(null);
+            if (testCaseId != null)
+            {
+                exportTestExecution(
+                    new TestCaseExecution(testCaseId, ZephyrExporter.createScenarioExecutionStatus(scenario)));
+            }
+        }
+        catch (NotUniqueMetaValueException e)
+        {
+            String errorMessage = SCENARIO + scenario.getTitle() + lineSeparator() + ERROR + e.getMessage();
+            errors.add(errorMessage);
+            LOGGER.atError().setCause(e).log("Got an error while exporting scenario execution");
         }
     }
 
@@ -255,5 +277,62 @@ public class ZephyrExporter
     {
         JiraEntity issue = jiraFacade.getIssue(testCaseId);
         return issue.getId();
+    }
+
+    private static TestCaseStatus createStoryExecutionStatus(Story story)
+    {
+        return story.getScenarios()
+            .stream()
+            .map(ZephyrExporter::createScenarioExecutionStatus)
+            .filter(ts -> ts == TestCaseStatus.FAILED)
+            .findFirst()
+            .orElse(TestCaseStatus.PASSED);
+    }
+
+    private static TestCaseStatus createScenarioExecutionStatus(Scenario scenario)
+    {
+        if (scenario.getExamples() == null)
+        {
+            return calculateExecutionStatus(scenario);
+        }
+        else
+        {
+            return scenario.getExamples().getExamples().stream()
+                .map(ZephyrExporter::calculateExecutionStatus)
+                .filter(ts -> ts == TestCaseStatus.FAILED)
+                .findFirst()
+                .orElse(TestCaseStatus.PASSED);
+        }
+    }
+
+    private static TestCaseStatus calculateExecutionStatus(AbstractStepsContainer steps)
+    {
+        List<Step> statuses = Stream.of(steps.getBeforeUserScenarioSteps(), steps.getSteps(),
+                                      steps.getAfterUserScenarioSteps())
+                                    .filter(Objects::nonNull)
+                                    .flatMap(List::stream)
+                                    .collect(Collectors.toList());
+
+        statuses = filterStepStatuses(statuses, "successful");
+        if (statuses.isEmpty())
+        {
+            return TestCaseStatus.PASSED;
+        }
+        statuses = filterStepStatuses(statuses, "ignorable");
+        statuses = filterStepStatuses(statuses, "notPerformed");
+        statuses = filterStepStatuses(statuses, "restarted");
+        if (statuses.isEmpty())
+        {
+            return TestCaseStatus.SKIPPED;
+        }
+        return filterStepStatuses(statuses, "pending").isEmpty() ? TestCaseStatus.PENDING
+            : TestCaseStatus.FAILED;
+    }
+
+    private static List<Step> filterStepStatuses(List<Step> statuses, String expectedStatus)
+    {
+        return statuses.stream()
+                       .filter(step -> !expectedStatus.equals(step.getOutcome()))
+                       .collect(Collectors.toList());
     }
 }

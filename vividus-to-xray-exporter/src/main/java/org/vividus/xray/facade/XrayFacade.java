@@ -41,7 +41,7 @@ import org.vividus.xray.model.CucumberTestCase;
 import org.vividus.xray.model.ManualTestCase;
 import org.vividus.xray.model.TestExecution;
 
-public class XrayFacade extends ExporterFacade
+public class XrayFacade
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XrayFacade.class);
 
@@ -122,11 +122,7 @@ public class XrayFacade extends ExporterFacade
     public void createTestsLink(String testCaseId, Optional<String> requirementId)
             throws IOException, JiraConfigurationException
     {
-<<<<<<< HEAD
         ExporterFacade.createTestsLink(testCaseId, requirementId, jiraFacade);
-=======
-        createTestsLink(testCaseId, requirementId, jiraFacade);
->>>>>>> 4e07c8a7 ([vividus-to-zephyr-exporter] Add ability import tests to zephyr)
     }
 
     private void checkIfIssueEditable(String issueKey)
