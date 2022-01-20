@@ -5,6 +5,7 @@ apply from: "logging.gradle"
 ext {
     springBootVersion = '2.6.3'
 }
+
 dependencies {
     implementation project(':vividus-facade-jira')
     implementation project(':vividus-util')

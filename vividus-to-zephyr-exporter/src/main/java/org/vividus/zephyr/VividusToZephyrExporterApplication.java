@@ -26,7 +26,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportResource;
 import org.vividus.exporter.config.VividusExporterCommonConfiguration;
 import org.vividus.jira.JiraConfigurationException;
-import org.vividus.zephyr.configuration.JiraFieldsMapping;
 import org.vividus.zephyr.configuration.ZephyrExporterConfiguration;
 import org.vividus.zephyr.configuration.ZephyrExporterProperties;
 import org.vividus.zephyr.exporter.ZephyrExporter;
@@ -34,8 +33,7 @@ import org.vividus.zephyr.exporter.ZephyrExporter;
 @SpringBootApplication
 @Import(VividusExporterCommonConfiguration.class)
 @ImportResource(locations = { "org/vividus/zephyr/spring.xml", "org/vividus/jira/spring.xml" })
-@EnableConfigurationProperties({ ZephyrExporterConfiguration.class, ZephyrExporterProperties.class,
-        JiraFieldsMapping.class })
+@EnableConfigurationProperties({ ZephyrExporterConfiguration.class, ZephyrExporterProperties.class })
 @SuppressWarnings("checkstyle:hideutilityclassconstructor")
 public class VividusToZephyrExporterApplication
 {

@@ -54,7 +54,7 @@ class ExporterFacadeTests
     {
         ExporterFacade.createTestsLink(ISSUE_ID, Optional.of(REQUIREMENT_ID), jiraFacade);
         assertThat(testLogger.getLoggingEvents(), is(Collections.singletonList(
-            info("Create '{}' link from {} to {}", LINK_NAME, ISSUE_ID, REQUIREMENT_ID))));
+                info("Create '{}' link from {} to {}", LINK_NAME, ISSUE_ID, REQUIREMENT_ID))));
         verify(jiraFacade).createIssueLink(ISSUE_ID, REQUIREMENT_ID, LINK_NAME);
     }
 

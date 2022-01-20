@@ -33,7 +33,7 @@ public final class ExporterFacade
     }
 
     public static void createTestsLink(String testCaseId, Optional<String> requirementId, JiraFacade jiraFacade)
-        throws IOException, JiraConfigurationException
+            throws IOException, JiraConfigurationException
     {
         if (requirementId.isPresent())
         {
