@@ -167,7 +167,8 @@ public class ZephyrExporter
             }
             else
             {
-                zephyrFacade.createTestSteps(story, createNewIssue(zephyrTest));
+                testCaseId = zephyrFacade.createTestCase(zephyrTest);
+                zephyrFacade.createTestSteps(story, getIssueId(testCaseId));
             }
             Optional<String> requirementId = story.getUniqueMetaValue(REQUIREMENT_ID);
 
@@ -200,7 +201,8 @@ public class ZephyrExporter
             }
             else
             {
-                zephyrFacade.createTestSteps(scenario, createNewIssue(zephyrTest));
+                testCaseId = zephyrFacade.createTestCase(zephyrTest);
+                zephyrFacade.createTestSteps(scenario, getIssueId(testCaseId));
             }
             Optional<String> requirementId = scenario.getUniqueMetaValue(REQUIREMENT_ID);
             ExporterFacade.createTestsLink(testCaseId, requirementId, jiraFacade);
@@ -248,9 +250,8 @@ public class ZephyrExporter
         zephyrTest.setSummary(parameters.getSummary());
     }
 
-    private String createNewIssue(ZephyrTestCase zephyrTestCase) throws IOException, JiraConfigurationException
+    private String getIssueId(String testCaseId) throws IOException, JiraConfigurationException
     {
-        String testCaseId = zephyrFacade.createTestCase(zephyrTestCase);
         JiraEntity issue = jiraFacade.getIssue(testCaseId);
         return issue.getId();
     }
