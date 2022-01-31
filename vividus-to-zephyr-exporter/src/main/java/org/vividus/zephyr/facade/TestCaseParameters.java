@@ -16,16 +16,12 @@
 
 package org.vividus.zephyr.facade;
 
-import java.util.List;
 import java.util.Set;
-
-import org.vividus.zephyr.model.CucumberTestStep;
 
 public class TestCaseParameters
 {
     private Set<String> labels;
     private Set<String> components;
-    private List<CucumberTestStep> cucumberTestSteps;
     private String summary;
 
     public Set<String> getLabels()
@@ -46,16 +42,6 @@ public class TestCaseParameters
     public void setComponents(Set<String> components)
     {
         this.components = components;
-    }
-
-    public List<CucumberTestStep> getCucumberTestSteps()
-    {
-        return cucumberTestSteps;
-    }
-
-    public void setCucumberTestSteps(List<CucumberTestStep> cucumberTestSteps)
-    {
-        this.cucumberTestSteps = cucumberTestSteps;
     }
 
     public String getSummary()

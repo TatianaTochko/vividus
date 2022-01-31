@@ -17,6 +17,7 @@
 package org.vividus.zephyr.facade;
 
 import static com.github.valfirst.slf4jtest.LoggingEvent.info;
+import static java.lang.System.lineSeparator;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,6 +40,7 @@ import java.util.Optional;
 import java.util.OptionalInt;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.github.valfirst.slf4jtest.TestLogger;
 import com.github.valfirst.slf4jtest.TestLoggerFactory;
@@ -340,8 +342,14 @@ class ZephyrFacadeTests
 
         zephyrFacade.createTestSteps(scenario, ISSUE_ID);
 
-        String body = "{\"step\":\"Examples:\",\"data\":"
-               + "\"|name 1|name 2|\\r\\n|value 1|value 2|\\r\\n|value 3|value 4|\\r\\n\"}";
+        String table = "|name 1|name 2|" + lineSeparator()
+            + "|value 1|value 2|" + lineSeparator()
+            + "|value 3|value 4|" + lineSeparator();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        table = objectMapper.writeValueAsString(table);
+
+        String body = "{\"step\":\"Examples:\",\"data\":" + table + "}";
 
         verify(client).executePost(String.format(TEST_STEP_ENDPOINT, ISSUE_ID), body);
     }

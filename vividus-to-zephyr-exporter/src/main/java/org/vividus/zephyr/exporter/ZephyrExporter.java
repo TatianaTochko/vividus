@@ -246,7 +246,6 @@ public class ZephyrExporter
         zephyrTest.setLabels(parameters.getLabels());
         zephyrTest.setComponents(parameters.getComponents());
         zephyrTest.setSummary(parameters.getSummary());
-        parameters.setCucumberTestSteps(parameters.getCucumberTestSteps());
     }
 
     private String createNewIssue(ZephyrTestCase zephyrTestCase) throws IOException, JiraConfigurationException
